@@ -34,3 +34,8 @@ pull:
 ################## Приватный доступ к гитхабу по токену
 gh_token_save:
 	git config --global credential.helper osxkeychain
+
+######## Убрать предупрежение о включении игногируемых файлов в репу
+skip_attention:
+	git config advice.addIgnoredFile false
+
