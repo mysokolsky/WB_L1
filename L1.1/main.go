@@ -8,18 +8,43 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand/v2"
+)
 
-type Human struct {
-	Name     string
-	Age      uint
-	Male     bool
-	Partner  *Human
-	Children []Human
+// Superhuman features
+var SuperHumanFeatures = [...]string{
+	"Fly",
+	"Fire",
+	"Teleportation",
+	"UnderWaterBreath",
+	"SuperStrong",
+	"BulletProof",
 }
 
-type Action struct {
+// Professions
+var Professions = [...]string{
+	"Economist",
+	"Developer",
+	"Lawer",
+	"Builder",
+	"Driver",
+	"Manager",
+}
+
+type Human struct {
+	Name       string
+	Age        uint
+	Male       bool
+	Partner    *Human
+	Children   []Human
+	Profession string
+}
+
+type SuperHuman struct {
 	Human
+	SuperFeature string
 }
 
 func NewHuman(name string, age uint, male bool) *Human {
@@ -29,6 +54,12 @@ func NewHuman(name string, age uint, male bool) *Human {
 		Male: male,
 		// Children: []Human{},
 	}
+}
+
+func NewSuperHuman(name string, age uint, male bool) *SuperHuman {
+	human := NewHuman(name, age, male)
+	fmt.Println("Появление нового сверхчеловека!")
+	return &SuperHuman{Human: *human}
 }
 
 func (h *Human) Print() {
@@ -81,12 +112,60 @@ func (h *Human) ChildrenBorn(name string, male bool) (*Human, error) {
 	return newChild, nil
 }
 
+func (h *Human) GetEndVerb() string {
+	if h.Male {
+		return ""
+	}
+	return "а"
+}
+
+func (h *Human) GetProfession() {
+	h.Profession = Professions[rand.IntN(len(Professions)-1)]
+	fmt.Println("Персонаж", h.Name, "получил"+h.GetEndVerb(), "профессию:", h.Profession)
+}
+
+func (sh *SuperHuman) GetSuperFeature() {
+	sh.SuperFeature = SuperHumanFeatures[rand.IntN(len(SuperHumanFeatures)-1)]
+	fmt.Println("Персонаж", sh.Name, "обрел"+sh.GetEndVerb(), "сверхспособность:", sh.SuperFeature)
+}
+
+func (h *Human) HumanBecomeSuperHuman() *SuperHuman {
+	fmt.Println("C", h.Name, "произошло экстраординарное событие!")
+	fmt.Println("И", h.Name, "стал"+h.GetEndVerb(), "сверхчеловеком!")
+	return &SuperHuman{Human: *h}
+}
+
+func (h *Human) UpdateAge(newAge uint) {
+	oldAge := h.Age
+	h.Age = newAge
+	fmt.Println("У персонажа", h.Name, "изменился возраст с", oldAge, "на", h.Age)
+}
+
 func main() {
 
 	Alex := NewHuman("Alexey", 35, true)
 
 	Vika := NewHuman("Vika", 29, false)
 
-	var act Action
+	if err := Alex.Marriage(Vika); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	Peter, err := Vika.ChildrenBorn("Peter", true)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	Peter.UpdateAge(18)
+
+	SuperPeter := Peter.HumanBecomeSuperHuman()
+
+	SuperPeter.GetSuperFeature()
+
+	action := struct{ SuperHuman }{*SuperPeter}
+
+	action.Print()
 
 }
