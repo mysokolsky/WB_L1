@@ -1,11 +1,52 @@
-# Определяем последнюю по числу папку для добавления в репу
-LAST_TASK:=$(shell ls -d L*.* | sort -V | tail -n1)
+# Определяем последнюю по числу папку для добавления в репу, например L3.21
+LAST_TASK := $(shell ls -d L*.* | sort -V | tail -n1)
+
+run:
+	@cd $(LAST_TASK) && go run .
+
+###############################################################################
+##                                                                           ##
+##                    CОЗДАНИЕ НОВОГО РЕПОЗИТОРИЯ WB_L..                     ##
+##                                                                           ##
+###############################################################################
+
+# Обрезаем имя после точки для создания репозитория, например L3.21 до L3
+CUTED_LAST_TASK := $(shell echo $(LAST_TASK) | cut -d. -f1)
+
+# Имя репозитория, например WB_L3
+REPO_NAME := WB_$(CUTED_LAST_TASK)
+
+# Токен GitHub (лежит уровнем выше)
+GITHUB_TOKEN := $(shell cat ../github_privacy/gh_tok.en)
+
+# URL API GitHub
+GITHUB_API := https://api.github.com/user/repos
+
+# URL репозитория
+GIT_URL := git@github.com:mysokolsky/$(REPO_NAME).git
+
+# Создаём репозиторий, если его ещё нет
+create-repo:
+	@if git ls-remote $(GIT_URL) >/dev/null 2>&1; then \
+		echo "Репозиторий $(REPO_NAME) уже существует"; \
+	else \
+		echo "Создаём репозиторий $(REPO_NAME)"; \
+		curl -s -H "Authorization: token $(GITHUB_TOKEN)" \
+		     -H "Accept: application/vnd.github.v3+json" \
+		     $(GITHUB_API) \
+		     -d '{"name":"$(REPO_NAME)","private":false,"auto_init":true}'; \
+	fi
+
+###############################################################################
+##                                                                           ##
+##                    ЗАЛИВКА ПОСЛЕДНИХ ИЗМЕНЕНИЙ В РЕПУ                     ##
+##                                                                           ##
+###############################################################################
 
 # Определяем ветку для автоматического пуша
 GITBRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 
-
-########### Дальше цели для работы с гитом
+# Дальше цели для работы с гитом
 add:
 	@git add "$(LAST_TASK)"; sleep 1
 	@for f in *; do \
@@ -30,12 +71,20 @@ pull:
 	git stash
 	git pull origin $(GITBRANCH)
 
+###############################################################################
+##                                                                           ##
+##                              СЛУЖЕБНЫЕ ЦЕЛИ                               ##
+##                                                                           ##
+###############################################################################
 
-################## Приватный доступ к гитхабу по токену
+# Сохранить токен для приватного доступа к гитхабу
 gh_token_save:
 	git config --global credential.helper osxkeychain
 
-######## Убрать предупрежение о включении игногируемых файлов в репу
+# Убрать предупрежение о включении игногируемых файлов в репу
 skip_attention:
 	git config advice.addIgnoredFile false
 
+# инициализировать голанг-проект в папке последнего задания
+init_new_task:
+	go mod init github.com/mysokolsky/$(REPO_NAME)/$(LAST_TASK)
