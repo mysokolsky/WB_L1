@@ -21,7 +21,7 @@ push: add
 	@if git diff --cached --quiet; then \
 		echo "Нет изменений для сохранения."; \
 	else \
-		@make commit; \
+		$(MAKE) commit; \
 		git push origin $(GITBRANCH); \
 	fi
 
