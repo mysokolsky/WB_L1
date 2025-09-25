@@ -1,16 +1,34 @@
-# Первый аргумент сохраним в переменную PARAM
-PARAM := $(firstword $(MAKECMDGOALS))
+# Собираем все цели из этого файла в качестве значения переменной ALL_TARGETS
+ALL_TARGETS := $(shell grep -E '^[a-zA-Z0-9_-]+:' Makefile | cut -d: -f1 | grep -v '^\.' | sort -u)
 
-# Уберём PARAM из списка целей, чтобы make не пытался его трактовать как цель
-ifneq ($(PARAM),)
-  $(eval $(PARAM):;@:)
-endif
+# Убираем конфликты названий целей с одноимёнными файлами
+.PHONY: $(ALL_TARGETS)
 
 # Определяем последнюю по числу папку для добавления в репу, например L3.21
 LAST_TASK := $(shell ls -d L*.* | sort -V | tail -n1)
 
-# Если параметр PARAM пустой, берем последнюю папку L*.*
-TASK := $(if $(PARAM),$(PARAM),$(LAST_TASK))
+# Первый аргумент вызова make сохраним в переменную PARAM
+# Пример: 
+# > make Arg1 target1 target2 ...
+# Arg1 сохраняем в переменную PARAM:
+PARAM_RAW := $(firstword $(MAKECMDGOALS))
+
+
+# Если PARAM_RAW не является уже определённой целью, создаём динамическую цель
+ifeq ($(filter $(PARAM_RAW),$(ALL_TARGETS)),)
+ifeq ($(PARAM_RAW),)
+# ничего, не указан параметр
+else
+$(eval .PHONY: $(PARAM_RAW))
+$(eval $(PARAM_RAW): ; @$(MAKE) run TASK=$(PARAM_RAW))
+endif
+endif
+
+# Если TASK не передан через PARAM_RAW, используем последнюю папку
+TASK ?= $(LAST_TASK)
+
+# # Если параметр PARAM пустой, берем последнюю папку L*.*
+# TASK := $(if $(PARAM),$(PARAM),$(LAST_TASK))
 
 # Автоматическая цель для запуска проекта в папке TASK или LAST_TASK(если PARAM не был задан) 
 run:
