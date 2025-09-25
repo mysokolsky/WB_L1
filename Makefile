@@ -45,8 +45,12 @@ CUTED_LAST_TASK := $(shell echo $(LAST_TASK) | cut -d. -f1)
 # Имя репозитория, например WB_L3
 REPO_NAME := WB_$(CUTED_LAST_TASK)
 
-# Токен GitHub (лежит уровнем выше)
+# Токен GitHub (лежит уровнем выше и не вставляется в репу для сохранения приватности репы)
+ifeq ($(wildcard ../github_privacy/gh_tok.en),)
+GITHUB_TOKEN :=
+else
 GITHUB_TOKEN := $(shell cat ../github_privacy/gh_tok.en)
+endif
 
 # URL API GitHub
 GITHUB_API := https://api.github.com/user/repos
