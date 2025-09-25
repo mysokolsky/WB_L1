@@ -11,20 +11,19 @@ LAST_TASK := $(shell ls -d L*.* | sort -V | tail -n1)
 # Пример: 
 # > make Arg1 target1 target2 ...
 # Arg1 сохраняем в переменную PARAM:
-PARAM_RAW := $(firstword $(MAKECMDGOALS))
+PARAM := $(firstword $(MAKECMDGOALS))
 
-
-# Если PARAM_RAW не является уже определённой целью, создаём динамическую цель
-ifeq ($(filter $(PARAM_RAW),$(ALL_TARGETS)),)
-ifeq ($(PARAM_RAW),)
+# Если PARAM не является уже определённой целью, создаём динамическую цель
+ifeq ($(filter $(PARAM),$(ALL_TARGETS)),)
+ifeq ($(PARAM),)
 # ничего, не указан параметр
 else
-$(eval .PHONY: $(PARAM_RAW))
-$(eval $(PARAM_RAW): ; @$(MAKE) run TASK=$(PARAM_RAW))
+$(eval .PHONY: $(PARAM))
+$(eval $(PARAM): ; @$(MAKE) run TASK=$(PARAM))
 endif
 endif
 
-# Если TASK не передан через PARAM_RAW, используем последнюю папку
+# Если TASK не передан через PARAM, используем последнюю папку
 TASK ?= $(LAST_TASK)
 
 # # Если параметр PARAM пустой, берем последнюю папку L*.*
