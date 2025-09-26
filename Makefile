@@ -30,7 +30,7 @@ endif
 endif
 
 # Автоматическая цель для запуска проекта в папке LAST_TASK
-run:
+run: init_new_task
 	@cd $(LAST_TASK) && go run .
 
 ###############################################################################
@@ -120,4 +120,11 @@ skip_attention:
 
 # инициализировать голанг-проект в папке последнего задания
 init_new_task:
-	go mod init github.com/mysokolsky/$(REPO_NAME)/$(LAST_TASK)
+	@if [ ! -f $(LAST_TASK)/go.mod ]; then \
+		echo "go.mod не найден, инициализируем новый проект..."; \
+		echo; \
+		cd $(LAST_TASK) && { \
+			go mod init github.com/mysokolsky/$(REPO_NAME)/$(LAST_TASK) > /dev/null 2>&1; \
+			go mod tidy  > /dev/null 2>&1; \
+		}; \
+	fi
