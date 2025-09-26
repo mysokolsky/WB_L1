@@ -19,6 +19,10 @@ import (
 	log "github.com/mysokolsky/gologen"
 )
 
+func square(num uint) uint {
+	return num * num
+}
+
 func main() {
 	defer log.Flush()
 
@@ -26,7 +30,7 @@ func main() {
 
 	for _, value := range mas {
 
-		fmt.Println(value)
+		fmt.Println(square(value))
 	}
 
 }
