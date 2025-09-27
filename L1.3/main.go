@@ -18,23 +18,18 @@ func main() {
 
 	type Job string
 
-	ch:=make(chan Job, 10) // создали буферизированный канал на 10 объектов Job
+	ch := make(chan Job, 10) // создали буферизированный канал на 10 объектов Job
 
-	var v Job = "Это строка"
+	ch <- Job("Это строка")
+	ch <- Job("Это вторая строка")
+	ch <- Job("Прикол")
 
-	ch <- v
+	close(ch)
 
-	var v2 Job = "Это вторая строка"
+	for s := range ch {
+		fmt.Println(string(s))
+		fmt.Println(len(ch))
+		fmt.Println(cap(ch))
+	}
 
-	ch <- v2
-
-	var s1, s2 Job
-
-	s1 = <- ch
-
-	fmt.Println(string(s1))
-
-		s2 = <- ch
-
-	fmt.Println(string(s2))
 }
