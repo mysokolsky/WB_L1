@@ -15,4 +15,7 @@ import "fmt"
 func main() {
 
 	fmt.Println("Super!")
+
+	ch:=make(chan Job, 10) // создали буферизированный канал 
+
 }
