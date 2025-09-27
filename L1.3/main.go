@@ -16,6 +16,25 @@ func main() {
 
 	fmt.Println("Super!")
 
-	ch:=make(chan Job, 10) // создали буферизированный канал 
+	type Job string
 
+	ch:=make(chan Job, 10) // создали буферизированный канал на 10 объектов Job
+
+	var v Job = "Это строка"
+
+	ch <- v
+
+	var v2 Job = "Это вторая строка"
+
+	ch <- v2
+
+	var s1, s2 Job
+
+	s1 = <- ch
+
+	fmt.Println(string(s1))
+
+		s2 = <- ch
+
+	fmt.Println(string(s2))
 }
