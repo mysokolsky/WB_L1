@@ -10,30 +10,61 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
+
+type Job string
+
+var jobs = [...]Job{Job("One"), Job("Two"), Job("Three"), Job("Four"), Job("Five")}
+
+var wg sync.WaitGroup
+
+func producer(out chan<- Job) {
+	defer wg.Done()
+	for _, value := range jobs {
+		out <- value
+	}
+	// close(out)
+}
+
+func worker(in <-chan Job) {
+	defer wg.Done()
+	for value := range in {
+		fmt.Println(string(value))
+	}
+}
 
 func main() {
 
 	fmt.Println("Super!")
 
-	type Job string
-
 	ch := make(chan Job, 10) // создали буферизированный канал на 10 объектов Job
 
-	ch <- Job("Это строка")
-	ch <- Job("Это вторая строка")
-	ch <- Job("Прикол")
+	// ch <- Job("Это строка")
+	// ch <- Job("Это вторая строка")
+	// ch <- Job("Прикол")
 
-	close(ch)
+	// close(ch)
 
-	for {
-		s, ok := <-ch
-		if !ok {
-			break
-		}
-		fmt.Println(string(s))
-		fmt.Println(len(ch))
-		fmt.Println(cap(ch))
+	// for {
+	// 	s, ok := <-ch
+	// 	if !ok {
+	// 		break
+	// 	}
+	// 	fmt.Println(string(s))
+	// 	fmt.Println(len(ch))
+	// 	fmt.Println(cap(ch))
+	// }
+	wg.Add(1)
+	go producer(ch)
+
+	for i := 1; i < 5; i++ {
+		wg.Add(1)
+		go worker(ch)
 	}
+
+	wg.Wait()
 
 }
