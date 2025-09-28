@@ -26,7 +26,11 @@ func main() {
 
 	close(ch)
 
-	for s := range ch {
+	for {
+		s, ok := <-ch
+		if !ok {
+			break
+		}
 		fmt.Println(string(s))
 		fmt.Println(len(ch))
 		fmt.Println(cap(ch))
