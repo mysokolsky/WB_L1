@@ -60,8 +60,11 @@ func main() {
 
 	if len(os.Args) > 1 {
 		num, err := strconv.Atoi(os.Args[1])
-		if err == nil {
+		if err == nil && num > 0 {
 			numWorkers = num
+		} else {
+			fmt.Println("Параметр не распознан как целое положительное число.")
+			fmt.Printf("Количество воркеров будет по умолчанию = %v\n\n", numWorkers)
 		}
 	}
 
