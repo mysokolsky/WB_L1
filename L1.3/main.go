@@ -12,59 +12,67 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+
 	"sync"
+	"time"
 )
 
-type Job string
-
-var jobs = [...]Job{Job("One"), Job("Two"), Job("Three"), Job("Four"), Job("Five")}
+type obj struct {
+	id   int
+	time time.Time
+}
 
 var wg sync.WaitGroup
 
-func producer(out chan<- Job) {
-	defer wg.Done()
-	for _, value := range jobs {
-		out <- value
+// продюсер пишет в канал
+func producer(out chan<- *obj) {
+
+	taskIndex := 0
+	for {
+		taskIndex++
+		out <- &obj{
+			taskIndex,
+			time.Now(),
+		}
+		time.Sleep(300 * time.Millisecond)
 	}
-	// close(out)
 }
 
-func worker(in <-chan Job) {
+// воркер читает из канала
+func worker(id_worker int, in <-chan *obj) {
 	defer wg.Done()
 	for value := range in {
-		fmt.Println(string(value))
+		fmt.Printf("w_%v\t|  task_id_%v\t|  %v\n",
+			id_worker,
+			value.id,
+			value.time.Format("2006-01-02 15:04:05.000000"))
 	}
 }
 
+// главная горутина
 func main() {
 
-	fmt.Println("Super!")
+	defer wg.Wait() // эта штука здесь в принципе не нужна, потому что поток бесконечный
 
-	ch := make(chan Job, 10) // создали буферизированный канал на 10 объектов Job
+	numWorkers := 5 // если параметр при запуске не задан, то количество воркеров = 5
 
-	// ch <- Job("Это строка")
-	// ch <- Job("Это вторая строка")
-	// ch <- Job("Прикол")
-
-	// close(ch)
-
-	// for {
-	// 	s, ok := <-ch
-	// 	if !ok {
-	// 		break
-	// 	}
-	// 	fmt.Println(string(s))
-	// 	fmt.Println(len(ch))
-	// 	fmt.Println(cap(ch))
-	// }
-	wg.Add(1)
-	go producer(ch)
-
-	for i := 1; i < 5; i++ {
-		wg.Add(1)
-		go worker(ch)
+	if len(os.Args) > 1 {
+		num, err := strconv.Atoi(os.Args[1])
+		if err == nil {
+			numWorkers = num
+		}
 	}
 
-	wg.Wait()
+	ch := make(chan *obj, 3) // создали буферизированный канал на 3 объекта специально, чтоб реализовать принцип GMP-переключения горутин
+
+	// воркеров необходимо запустить до заполнения канала, иначе до них не дойдёт программа и будет дедлок
+	wg.Add(numWorkers)
+	for i := 1; i <= numWorkers; i++ {
+		go worker(i, ch)
+	}
+
+	producer(ch) // запускаем заполнение канала в главной горутине
 
 }
