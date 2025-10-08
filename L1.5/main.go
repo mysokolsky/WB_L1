@@ -29,28 +29,33 @@ func main() {
 	for i := 0; i < numWorkers; i++ {
 
 		go func() {
-			defer wg.Done()
+
 			for {
 				v, ok := <-ch
-				if ok {
-					fmt.Println(v)
-				} else {
-					return
+				if !ok {
+					break
 				}
+				fmt.Println(v)
 			}
+			wg.Done()
 		}()
 
 	}
 
-	i := 0
+	timer := time.After(3 * time.Second)
+	j := 0
+loop:
 	for {
-		i++
+		j++
 		select {
-		case <-time.After(3 * time.Second):
+		case <-timer:
 			close(ch)
-			return
-		case ch <- i:
+			break loop
+		case ch <- j:
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
+
+	wg.Wait()
 
 }
