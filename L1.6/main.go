@@ -17,6 +17,24 @@
 
 package main
 
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+var wg sync.WaitGroup
+
+func autoReturn() {
+	fmt.Println("Горутина завершится через 4 секунды через Return")
+	time.Sleep(4 * time.Second)
+	wg.Done()
+	return
+}
+
 func main() {
+
+	wg.Add(1)
+	go autoReturn()
 
 }
