@@ -21,20 +21,24 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"golang.org/x/text/number"
 )
 
 var wg sync.WaitGroup
 
-func autoReturn() {
-	fmt.Println("Горутина завершится через 4 секунды через Return")
-	time.Sleep(4 * time.Second)
-	wg.Done()
-	return
+func autoReturn(name string) {
+	defer wg.Done()
+
+	fmt.Printf("Горутина №1 (%s) завершится через 4 секунды", name)
+	time.Sleep(4000 * time.Millisecond)
+	fmt.Printf("Горутина №1 (%s) завершает работу", name)
 }
 
 func main() {
 
 	wg.Add(1)
-	go autoReturn()
+	go autoReturn("автовыход через Return")
 
+	wg.Wait()
 }
