@@ -26,40 +26,40 @@ import (
 
 var wg sync.WaitGroup
 
-// func autoReturn(name string) {
-// 	defer wg.Done()
+func autoReturn(name string) {
+	defer wg.Done()
 
-// 	fmt.Printf("Горутина №1 (%s) завершится через 4 секунды\n", name)
-// 	time.Sleep(4000 * time.Millisecond)
-// 	fmt.Printf("Горутина №1 (%s) завершает работу\n", name)
-// }
+	fmt.Printf("Горутина №1 (%s) завершится через 4 секунды\n", name)
+	time.Sleep(4000 * time.Millisecond)
+	fmt.Printf("Горутина №1 (%s) завершает работу\n", name)
+}
 
-// func closeCh(name string, ch2 chan int) {
-// 	defer wg.Done()
+func closeCh(name string, ch2 chan int) {
+	defer wg.Done()
 
-// 	fmt.Printf("Горутина №2 (%s) завершится через 4 секунды\n", name)
-// 	for value := range ch2 {
-// 		fmt.Println("g2:", value)
-// 	}
-// 	fmt.Printf("Горутина №2 (%s) завершает работу\n", name)
-// }
+	fmt.Printf("Горутина №2 (%s) завершится через 4 секунды\n", name)
+	for value := range ch2 {
+		fmt.Println("g2:", value)
+	}
+	fmt.Printf("Горутина №2 (%s) завершает работу\n", name)
+}
 
-// func signalCh(name string, ch3 chan int, quitCh chan struct{}) {
-// 	defer wg.Done()
+func signalCh(name string, ch3 chan int, quitCh chan struct{}) {
+	defer wg.Done()
 
-// 	fmt.Printf("Горутина №3 (%s) завершится через 4 секунды\n", name)
-// 	for {
-// 		select {
-// 		case value := <-ch3:
-// 			fmt.Println("g3:", value)
-// 		case <-quitCh:
-// 			close(ch3)
-// 			fmt.Printf("Горутина №3 (%s) завершает работу\n", name)
-// 			return
-// 		}
-// 	}
+	fmt.Printf("Горутина №3 (%s) завершится через 4 секунды\n", name)
+	for {
+		select {
+		case value := <-ch3:
+			fmt.Println("g3:", value)
+		case <-quitCh:
+			close(ch3)
+			fmt.Printf("Горутина №3 (%s) завершает работу\n", name)
+			return
+		}
+	}
 
-// }
+}
 
 func contextExit(name string, ch4 chan int, ctx context.Context) {
 	defer wg.Done()
@@ -79,33 +79,33 @@ func contextExit(name string, ch4 chan int, ctx context.Context) {
 
 func main() {
 
-	// wg.Add(1)
-	// go autoReturn("автовыход через Return")
+	wg.Add(1)
+	go autoReturn("автовыход через Return")
 
-	// ch2 := make(chan int)
-	// wg.Add(1)
-	// go closeCh("закрытие канала", ch2)
-	// for i := 0; ; i++ {
-	// 	ch2 <- i
-	// 	time.Sleep(400 * time.Millisecond)
-	// 	if i > 10 {
-	// 		close(ch2)
-	// 		break
-	// 	}
-	// }
+	ch2 := make(chan int)
+	wg.Add(1)
+	go closeCh("закрытие канала", ch2)
+	for i := 0; ; i++ {
+		ch2 <- i
+		time.Sleep(400 * time.Millisecond)
+		if i > 10 {
+			close(ch2)
+			break
+		}
+	}
 
-	// ch3 := make(chan int)
-	// quitCh := make(chan struct{})
-	// wg.Add(1)
-	// go signalCh("сигнальный канал", ch3, quitCh)
-	// for i := 0; ; i++ {
-	// 	ch3 <- i * i
-	// 	time.Sleep(400 * time.Millisecond)
-	// 	if i > 10 {
-	// 		close(quitCh) // закрываем сигнальный канал
-	// 		break
-	// 	}
-	// }
+	ch3 := make(chan int)
+	quitCh := make(chan struct{})
+	wg.Add(1)
+	go signalCh("сигнальный канал", ch3, quitCh)
+	for i := 0; ; i++ {
+		ch3 <- i * i
+		time.Sleep(400 * time.Millisecond)
+		if i > 10 {
+			close(quitCh) // закрываем сигнальный канал
+			break
+		}
+	}
 
 	ch4 := make(chan int)
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(4*time.Second))
@@ -118,9 +118,11 @@ loop:
 		case <-ctx.Done():
 			close(ch4)
 			break loop
+		default:
+			ch4 <- i*i + i
+			time.Sleep(400 * time.Millisecond)
 		}
-		ch4 <- i*i + i
-		time.Sleep(400 * time.Millisecond)
+
 	}
 
 	wg.Wait()
