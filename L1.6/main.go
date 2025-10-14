@@ -77,6 +77,22 @@ func contextExit(name string, ch4 chan int, ctx context.Context) {
 	}
 }
 
+func timerExit(name string, ch5 chan int) {
+	defer wg.Done()
+	fmt.Printf("Горутина №5 (%s) завершится через 4 секунды\n", name)
+	defer fmt.Printf("Горутина №5 (%s) завершает работу\n", name)
+
+	for {
+
+		value, ok := <-ch5
+		if !ok {
+			return
+		}
+		fmt.Println("g5:", value)
+	}
+
+}
+
 func main() {
 
 	wg.Add(1)
@@ -113,7 +129,7 @@ func main() {
 	wg.Add(1)
 	go contextExit("context", ch4, ctx)
 loop:
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 5; i++ {
 		select {
 		case <-ctx.Done():
 			close(ch4)
@@ -123,6 +139,22 @@ loop:
 			time.Sleep(400 * time.Millisecond)
 		}
 
+	}
+
+	ch5 := make(chan int)
+	timer := time.After(4 * time.Second)
+	wg.Add(1)
+	go timerExit("time.After", ch5)
+loop2:
+	for i := 0; ; i++ {
+		select {
+		case <-timer: // при закрытии канала
+			close(ch5) // закрываем канал
+			break loop2
+		default:
+			ch5 <- i*i - i
+			time.Sleep(400 * time.Millisecond)
+		}
 	}
 
 	wg.Wait()
