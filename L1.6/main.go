@@ -18,182 +18,225 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"fmt"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 )
 
 var wg sync.WaitGroup
 
-// горутина №1
-func autoReturn(name string) {
+// // горутина №1
+// func autoReturn(name string) {
+// 	defer wg.Done()
+
+// 	fmt.Printf("Горутина №1 (%s) завершится через 4 секунды\n", name)
+// 	defer fmt.Printf("Горутина №1 (%s) завершила работу\n", name)
+
+// 	fmt.Println("g1: работа горутины...") // безканальная работа
+// 	time.Sleep(4000 * time.Millisecond)
+// 	fmt.Println("Горутина №1: авто выход по завершению работы функции")
+
+// }
+
+// // горутина №2
+// func closeCh(name string, ch2 chan int) {
+// 	defer wg.Done()
+
+// 	fmt.Printf("Горутина №2 (%s) завершится через 4 секунды\n", name)
+// 	defer fmt.Printf("Горутина №2 (%s) завершила работу\n", name)
+
+// 	for value := range ch2 { // читаем данные из канала
+// 		fmt.Println("g2:", value)
+// 	} // условие завершения горутины
+
+// 	fmt.Println("Горутина №2: выход по закрытию канала")
+
+// }
+
+// // горутина №3
+// func signalCh(name string, ch3 chan int, quitCh chan struct{}) {
+// 	defer wg.Done()
+
+// 	fmt.Printf("Горутина №3 (%s) завершится через 4 секунды\n", name)
+// 	defer fmt.Printf("Горутина №3 (%s) завершила работу\n", name)
+
+// 	for {
+// 		select {
+// 		case value := <-ch3: // читаем данные из канала
+// 			fmt.Println("g3:", value)
+// 		case <-quitCh: // условие завершения горутины
+// 			fmt.Println("Горутина №3: выход по закрытию сигнального канала")
+// 			close(ch3)
+// 			return
+// 		}
+// 	}
+
+// }
+
+// // горутина №4
+// func contextExit(name string, ch4 chan int, ctx context.Context) {
+// 	defer wg.Done()
+
+// 	fmt.Printf("Горутина №4 (%s) завершится через 4 секунды\n", name)
+// 	defer fmt.Printf("Горутина №4 (%s) завершила работу\n", name)
+
+// 	for {
+// 		select {
+// 		case <-ctx.Done(): // условие завершения горутины
+// 			fmt.Println("Горутина №4: выход по сигналу отмены контекста")
+// 			return
+// 		case value := <-ch4: // читаем данные из канала
+// 			fmt.Println("g4:", value)
+// 		}
+// 	}
+// }
+
+// // горутина №5
+// func timerExit(name string, ch5 chan int) {
+// 	defer wg.Done()
+
+// 	fmt.Printf("Горутина №5 (%s) завершится через 4 секунды\n", name)
+// 	defer fmt.Printf("Горутина №5 (%s) завершила работу\n", name)
+
+// 	for {
+// 		value, ok := <-ch5 // читаем данные из канала
+// 		if !ok {           // условие завершения горутины
+// 			fmt.Println("Горутина №5: выход по окончанию таймера")
+// 			return
+// 		}
+// 		fmt.Println("g5:", value)
+// 	}
+
+// }
+
+// горутина №6
+func osInterrupt(name string, ch6 chan int) {
 	defer wg.Done()
 
-	fmt.Printf("Горутина №1 (%s) завершится через 4 секунды\n", name)
-	defer fmt.Printf("Горутина №1 (%s) завершила работу\n", name)
+	fmt.Printf("Горутина №6 (%s) завершится через 4 секунды\n", name)
+	defer fmt.Printf("Горутина №6 (%s) завершила работу\n", name)
 
-	fmt.Println("g1: работа горутины...") // безканальная работа
-	time.Sleep(4000 * time.Millisecond)
-	fmt.Println("Горутина №1: авто выход по завершению работы функции")
-
+	for value := range ch6 { // читаем данные из канала
+		fmt.Println("g6:", value)
+	}
+	fmt.Println("\nГорутина №6: выход по сигналу ОС")
 }
 
-// горутина №2
-func closeCh(name string, ch2 chan int) {
-	defer wg.Done()
+// // вызов горутины №1
+// func autoReturnRun() {
+// 	wg.Add(1)
+// 	go autoReturn("автовыход через Return") // запуск горутины
+// }
 
-	fmt.Printf("Горутина №2 (%s) завершится через 4 секунды\n", name)
-	defer fmt.Printf("Горутина №2 (%s) завершила работу\n", name)
+// // вызов горутины №2
+// func closeChRun() {
+// 	ch2 := make(chan int)
+// 	wg.Add(1)
+// 	go closeCh("закрытие канала", ch2) // запуск горутины
+// 	for i := 0; ; i++ {
+// 		ch2 <- i // наполнение канала данными
+// 		time.Sleep(400 * time.Millisecond)
+// 		if i > 10 {
+// 			close(ch2)
+// 			break
+// 		}
+// 	}
+// }
 
-	for value := range ch2 { // читаем данные из канала
-		fmt.Println("g2:", value)
-	} // условие завершения горутины
+// // вызов горутины №3
+// func signalChRun() {
+// 	ch3 := make(chan int)
+// 	quitCh := make(chan struct{})
+// 	wg.Add(1)
+// 	go signalCh("сигнальный канал", ch3, quitCh) // запуск горутины
+// 	for i := 0; ; i++ {
+// 		ch3 <- i * i // наполнение канала данными
+// 		time.Sleep(400 * time.Millisecond)
+// 		if i > 10 {
+// 			close(quitCh) // закрываем сигнальный канал
+// 			break
+// 		}
+// 	}
+// }
 
-	fmt.Println("Горутина №2: выход по закрытию канала")
+// // вызов горутины №4
+// func contextExitRun() {
+// 	ch4 := make(chan int)
+// 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(4*time.Second)) // завершаем контекст при достижении момента времени "сейчас + 4 секунды"
+// 	defer cancel()
+// 	wg.Add(1)
+// 	go contextExit("context", ch4, ctx) // запуск горутины
+// loop:
+// 	for i := 0; i < 5; i++ {
+// 		select {
+// 		case <-ctx.Done():
+// 			close(ch4)
+// 			break loop
+// 		default:
+// 			ch4 <- i*i + i // наполнение канала данными
+// 			time.Sleep(400 * time.Millisecond)
+// 		}
 
-}
+// 	}
+// }
 
-// горутина №3
-func signalCh(name string, ch3 chan int, quitCh chan struct{}) {
-	defer wg.Done()
+// // вызов горутины №5
+// func timerExitRun() {
+// 	ch5 := make(chan int)
+// 	timer := time.After(4 * time.Second)
+// 	wg.Add(1)
+// 	go timerExit("time.After", ch5) // запуск горутины
+// loop2:
+// 	for i := 0; ; i++ {
+// 		select {
+// 		case <-timer: // при закрытии канала таймера
+// 			close(ch5) // закрываем канал данных
+// 			break loop2
+// 		default:
+// 			ch5 <- i*i - i // наполнение канала данными
+// 			time.Sleep(400 * time.Millisecond)
+// 		}
+// 	}
+// }
 
-	fmt.Printf("Горутина №3 (%s) завершится через 4 секунды\n", name)
-	defer fmt.Printf("Горутина №3 (%s) завершила работу\n", name)
+// вызов горутины №6
+func osInterruptRun() {
+	ch6 := make(chan int)
+	interruptCh := make(chan os.Signal, 1)
+	signal.Notify(interruptCh, os.Interrupt, syscall.SIGTERM) // слушаем системные сигналы Ctrl + C и kill pid
+	fmt.Println("для выхода из горутины нажмите Ctrl + C")
+	wg.Add(1)
+	go osInterrupt("Ctrl + C, kill pid", ch6) // запуск горутины
 
-	for {
+loop3:
+	for i := 0; i < 10; i++ {
 		select {
-		case value := <-ch3: // читаем данные из канала
-			fmt.Println("g3:", value)
-		case <-quitCh: // условие завершения горутины
-			fmt.Println("Горутина №3: выход по закрытию сигнального канала")
-			close(ch3)
-			return
-		}
-	}
-
-}
-
-// горутина №4
-func contextExit(name string, ch4 chan int, ctx context.Context) {
-	defer wg.Done()
-
-	fmt.Printf("Горутина №4 (%s) завершится через 4 секунды\n", name)
-	defer fmt.Printf("Горутина №4 (%s) завершила работу\n", name)
-
-	for {
-		select {
-		case <-ctx.Done(): // условие завершения горутины
-			fmt.Println("Горутина №4: выход по сигналу отмены контекста")
-			return
-		case value := <-ch4: // читаем данные из канала
-			fmt.Println("g4:", value)
-		}
-	}
-}
-
-// горутина №5
-func timerExit(name string, ch5 chan int) {
-	defer wg.Done()
-
-	fmt.Printf("Горутина №5 (%s) завершится через 4 секунды\n", name)
-	defer fmt.Printf("Горутина №5 (%s) завершила работу\n", name)
-
-	for {
-		value, ok := <-ch5 // читаем данные из канала
-		if !ok {           // условие завершения горутины
-			fmt.Println("Горутина №5: выход по окончанию таймера")
-			return
-		}
-		fmt.Println("g5:", value)
-	}
-
-}
-
-// вызов горутины №1
-func autoReturnRun() {
-	wg.Add(1)
-	go autoReturn("автовыход через Return") // запуск горутины
-}
-
-// вызов горутины №2
-func closeChRun() {
-	ch2 := make(chan int)
-	wg.Add(1)
-	go closeCh("закрытие канала", ch2) // запуск горутины
-	for i := 0; ; i++ {
-		ch2 <- i // наполнение канала данными
-		time.Sleep(400 * time.Millisecond)
-		if i > 10 {
-			close(ch2)
-			break
-		}
-	}
-}
-
-// вызов горутины №3
-func signalChRun() {
-	ch3 := make(chan int)
-	quitCh := make(chan struct{})
-	wg.Add(1)
-	go signalCh("сигнальный канал", ch3, quitCh) // запуск горутины
-	for i := 0; ; i++ {
-		ch3 <- i * i // наполнение канала данными
-		time.Sleep(400 * time.Millisecond)
-		if i > 10 {
-			close(quitCh) // закрываем сигнальный канал
-			break
-		}
-	}
-}
-
-// вызов горутины №4
-func contextExitRun() {
-	ch4 := make(chan int)
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(4*time.Second)) // завершаем контекст при достижении момента времени "сейчас + 4 секунды"
-	defer cancel()
-	wg.Add(1)
-	go contextExit("context", ch4, ctx) // запуск горутины
-loop:
-	for i := 0; i < 5; i++ {
-		select {
-		case <-ctx.Done():
-			close(ch4)
-			break loop
+		case <-interruptCh: // при получении сигнала системы и закрытии канала
+			close(ch6) // закрываем канал данных
+			break loop3
 		default:
-			ch4 <- i*i + i // наполнение канала данными
-			time.Sleep(400 * time.Millisecond)
-		}
-
-	}
-}
-
-// вызов горутины №5
-func timerExitRun() {
-	ch5 := make(chan int)
-	timer := time.After(4 * time.Second)
-	wg.Add(1)
-	go timerExit("time.After", ch5) // запуск горутины
-loop2:
-	for i := 0; ; i++ {
-		select {
-		case <-timer: // при закрытии канала таймера
-			close(ch5) // закрываем канал данных
-			break loop2
-		default:
-			ch5 <- i*i - i // наполнение канала данными
-			time.Sleep(400 * time.Millisecond)
+			ch6 <- i*i - i + 2*i // наполнение канала данными
+			time.Sleep(1 * time.Second)
 		}
 	}
+
+	signal.Stop(interruptCh) // прекращаем отслеживать сигнал пользователя на Ctrl + C и kill pid
+	close(interruptCh)       // закрываем специальный канал
+
 }
 
 func main() {
 
-	autoReturnRun()  // 1 - автовыход через Return
-	closeChRun()     // 2 - закрытие канала
-	signalChRun()    // 3 - сигнальный канал
-	contextExitRun() // 4 - context с дедлайном
-	timerExitRun()   // 5 - time.After
+	// autoReturnRun()  // 1 - автовыход через Return
+	// closeChRun()     // 2 - закрытие канала
+	// signalChRun()    // 3 - сигнальный канал
+	// contextExitRun() // 4 - context с дедлайном
+	// timerExitRun()   // 5 - time.After
+	osInterruptRun() // 6 - Ctrl + C, kill pid...
 
 	wg.Wait()
 }
