@@ -260,6 +260,7 @@ func runtimeExit(name string, ch7 chan failObj) {
 	fmt.Println("эта строчка никогда не будет достигнута из-за паники выше")
 }
 
+// вызов горутины №7
 func runtimeExitRun() {
 
 	ch7 := make(chan failObj)
