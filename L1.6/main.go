@@ -42,14 +42,13 @@ func autoReturn(name string) {
 	fmt.Printf("Горутина №1 (%s) завершится через 4 секунды\n", name)
 	defer fmt.Printf("Горутина №1 (%s) завершила работу\n", name)
 
-	fmt.Println("g1: работа горутины...") // безканальная работа
 	for i := 0; ; i++ {
 		if i > 4 {
 			fmt.Println("Горутина №1: авто выход по условию")
 			return
 		}
 		time.Sleep(1000 * time.Millisecond)
-		fmt.Println("g1:", i)
+		fmt.Println("g1:", i) // безканальная работа
 	}
 }
 
