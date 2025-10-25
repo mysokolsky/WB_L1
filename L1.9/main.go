@@ -97,6 +97,7 @@ func main() {
 	ch1 := make(chan int, 1)
 	ch2 := make(chan int, 1)
 
+	fmt.Println("\nПреобразованные данные:")
 	wg.Add(3)
 	go printer(ch2)       // вывод данных из 2го канала на консоль
 	go operator(ch1, ch2) // считывание из 1го канала, преобразование и запись данных во 2й канал
