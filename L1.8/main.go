@@ -113,6 +113,15 @@ func inputBit() bool {
 	return bit
 }
 
+// печать линии-разделителя заданным количеством символов
+func printLine(str string) {
+	lenLine := utf8.RuneCountInString(str)
+	for i := 0; i < lenLine; i++ {
+		fmt.Printf("─")
+	}
+	println()
+}
+
 // вывод в консоль введённых данных
 func (num *Number) printOutput() {
 	cls()
@@ -144,13 +153,8 @@ func (num *Number) printOutput() {
 	fmt.Printf("        Номер бита: %s\n", posStr)
 	fmt.Printf("             Число: %s\n", numStr)
 
-	// печатаем линию-разделитель
-	lenLine := utf8.RuneCountInString(numStr + "Итоговый результат: ")
-	for i := 0; i < lenLine; i++ {
-		fmt.Printf("─")
-	}
-	println()
-
+	// печатаем линию-разделитель по длине самой длинной строки
+	printLine(numStr + "Итоговый результат: ")
 }
 
 func (num *Number) input() {
@@ -185,10 +189,9 @@ func main() {
 			result = insertZeroBit(*num.number, *num.position)
 		}
 
-		fmt.Printf("Итоговый результат: ")
-
-		width := int(unsafe.Sizeof(result) * 8)                        // width - ширина числа в количестве бит. Для int64 ширина width = 64
-		fmt.Printf("%0*b (в десятичной: %d)\n", width, result, result) // width подставляется вместо *
+		width := int(unsafe.Sizeof(result) * 8)                                      // width - ширина числа в количестве бит. Для int64 ширина width = 64
+		resultStr := fmt.Sprintf("%0*b (в десятичной: %d)\n", width, result, result) // width подставляется вместо *
+		fmt.Printf("Итоговый результат: %s", resultStr)
 	}
 
 }
