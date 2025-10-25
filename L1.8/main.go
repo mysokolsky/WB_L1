@@ -12,24 +12,37 @@
 
 // Решение:
 
+// Пример запуска программы из консоли с автоматическим вводом:
+// go run . <<< "-011111101001011 12 0"
+
 package main
 
 import (
 	"errors"
 	"fmt"
+	"unicode/utf8"
 	"unsafe"
 )
 
+// структура для хранения числа, номера бита, нуля или единицы(в формате bool)
 type Number struct {
-	number   int64
-	position uint8
-	bit      bool
+	number   *int64
+	position *uint8
+	bit      *bool
 }
 
+// чистка консоли
 func cls() {
 	fmt.Println("\033[H\033[2J")
 }
 
+// печать ошибки
+func printError() {
+	cls()
+	fmt.Println("Ошибка ввода")
+}
+
+// замена бита в числе на 1
 func insertOneBit(number int64, position uint8) int64 {
 	var sign int64 = 1
 	if number < 0 {
@@ -40,6 +53,7 @@ func insertOneBit(number int64, position uint8) int64 {
 	return number * sign
 }
 
+// замена бита в числе на 0
 func insertZeroBit(number int64, position uint8) int64 {
 	var sign int64 = 1
 	if number < 0 {
@@ -50,6 +64,7 @@ func insertZeroBit(number int64, position uint8) int64 {
 	return number * sign
 }
 
+// ввод числа
 func inputNumber() int64 {
 	var number int64
 	var err error = errors.New("not nil")
@@ -58,13 +73,13 @@ func inputNumber() int64 {
 		fmt.Println("Введите число в двоичной форме, можно с минусом. Например, -010011:")
 		_, err = fmt.Scanf("%b", &number)
 		if err != nil {
-			cls()
-			fmt.Println("Ошибка ввода")
+			printError()
 		}
 	}
 	return number
 }
 
+// ввод номера бита в числе
 func inputPosition() uint8 {
 	var position uint8
 	var err error = errors.New("not nil")
@@ -72,23 +87,22 @@ func inputPosition() uint8 {
 		fmt.Println("Введите номер перезаписываемого бита (от 0 до 62 справа налево):")
 		_, err = fmt.Scanf("%d", &position)
 		if err != nil || position > 62 {
-			cls()
-			fmt.Println("\nОшибка ввода")
+			printError()
 		}
 	}
 	return position
 }
 
+// ввод бита
 func inputBit() bool {
 	var bit bool
 	var digit uint8
 	var err error = errors.New("not nil")
 	for digit > 1 || err != nil {
-		fmt.Println("\nВыберите бит 0 или 1 для записи:")
+		fmt.Println("Выберите бит 0 или 1 для записи:")
 		_, err = fmt.Scanf("%d", &digit)
 		if err != nil || digit > 1 {
-			cls()
-			fmt.Println("Ошибка ввода")
+			printError()
 		}
 	}
 	if digit > 0 {
@@ -97,51 +111,82 @@ func inputBit() bool {
 	return bit
 }
 
+// вывод в консоль введённых данных
 func (num *Number) printOutput() {
 	cls()
 	println()
-	pos_bit := 64 - num.position
-	digit := 0
-	if num.bit {
-		digit = 1
+
+	bitStr := "?"
+	posStr := "?"
+	numStr := "?"
+
+	var positionBit uint8
+	if num.position != nil {
+		positionBit = 64 - *num.position
+		posStr = fmt.Sprintf("%*v (%dй бит)", positionBit, "v", *num.position)
+		bitStr = fmt.Sprintf("%*v", positionBit, "?")
 	}
-	fmt.Printf("     Бит - 0 или 1: %*d\n", pos_bit, digit)
-	fmt.Printf("        Номер бита: %*v (%dй бит)\n", pos_bit, "v", num.position)
-	fmt.Printf("             Число: %064b (в десятичной: %d)\n", num.number, num.number)
+
+	if num.bit != nil {
+		digit := 0
+		if *num.bit {
+			digit = 1
+		}
+		bitStr = fmt.Sprintf("%*d", positionBit, digit)
+	}
+
+	numStr = fmt.Sprintf("%064b (в десятичной: %d)", *num.number, *num.number)
+
+	// выводим данные ввода
+	fmt.Printf("     Бит - 0 или 1: %s\n", bitStr)
+	fmt.Printf("        Номер бита: %s\n", posStr)
+	fmt.Printf("             Число: %s\n", numStr)
+
+	// печатаем линию-разделитель
+	lenLine := utf8.RuneCountInString(numStr + "Итоговый результат: ")
+	for i := 0; i < lenLine; i++ {
+		fmt.Printf("─")
+	}
+	println()
+
 }
 
 func (num *Number) input() {
 
-	num.number = inputNumber()
-	cls()
-	fmt.Printf("\nЧисло: %064b (в десятичной: %d)\n", num.number, num.number)
+	// ввод числа
+	number := inputNumber()
+	num.number = &number
+	num.printOutput()
 
-	num.position = inputPosition()
-	cls()
-	fmt.Printf("         Номер бита: %*v (%dй бит)\n", 64-num.position, "v", num.position)
-	fmt.Printf("              Число: %064b\n", num.number)
+	// ввод номера бита в числе для замены
+	position := inputPosition()
+	num.position = &position
+	num.printOutput()
 
-	num.bit = inputBit()
-	cls()
-
+	// ввод бита для вставки
+	bit := inputBit()
+	num.bit = &bit
 	num.printOutput()
 }
 
 func main() {
 
-	var num Number
+	num := Number{}
 	num.input()
+
 	var result int64
 
-	if num.bit {
-		result = insertOneBit(num.number, num.position)
-	} else {
-		result = insertZeroBit(num.number, num.position)
+	if num.bit != nil {
+		if *num.bit {
+			result = insertOneBit(*num.number, *num.position)
+		} else {
+			result = insertZeroBit(*num.number, *num.position)
+		}
+
+		fmt.Printf("Итоговый результат: ")
+
+		width := int(unsafe.Sizeof(result) * 8)                        // width - ширина числа в количестве бит. Для int64 ширина width = 64
+		fmt.Printf("%0*b (в десятичной: %d)\n", width, result, result) // width подставляется вместо *
 	}
-
-	fmt.Printf("Итоговый результат: ")
-
-	width := int(unsafe.Sizeof(result) * 8)                        // width - ширина числа в количестве бит. Для int64 ширина width = 64
-	fmt.Printf("%0*b (в десятичной: %d)\n", width, result, result) // width подставляется вместо *
 
 }
