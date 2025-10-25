@@ -94,8 +94,8 @@ func main() {
 
 	fmt.Printf("\nПервоначальный массив:\n%+v\n", mas)
 
-	ch1 := make(chan int, 1)
-	ch2 := make(chan int, 1)
+	ch1 := make(chan int, 10)
+	ch2 := make(chan int, 10)
 
 	fmt.Println("\nПреобразованные данные:")
 	wg.Add(3)
