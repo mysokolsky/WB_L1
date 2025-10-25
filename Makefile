@@ -82,14 +82,14 @@ GITBRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 # Получаем данные, настроен ли remote для текущей ветки
 # Если HAS_UPSTREAM пуст, значит upstream не настроен
 # настроенный upstream позволит писать короткие команды git push и git pull без указания origin
-HAS_UPSTREAM := $(shell git config --get branch.$(GIT_BRANCH).remote)
+HAS_UPSTREAM := $(shell git config --get branch.$(GITBRANCH).remote)
 
 
 # Цель, которая выполняет настройку только если она нужна
 set_upstream:
 ifeq ($(HAS_UPSTREAM),)
-	@echo "Upstream не настроен для ветки $(GIT_BRANCH). Настраиваем..."
-	@git push --set-upstream origin $(GIT_BRANCH)
+	@echo "Upstream не настроен для ветки $(GITBRANCH). Настраиваем..."
+	@git push --set-upstream origin $(GITBRANCH)
 endif
 
 # Дальше цели для работы с гитом
