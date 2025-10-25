@@ -141,7 +141,7 @@ func main() {
 
 	fmt.Printf("Итоговый результат: ")
 
-	width := int(unsafe.Sizeof(result) * 8) // width - ширина числа в количестве бит. Для int64 ширина width = 64
-	fmt.Printf("%0*b\n", width, result)     // width подставляется вместо *
+	width := int(unsafe.Sizeof(result) * 8)                        // width - ширина числа в количестве бит. Для int64 ширина width = 64
+	fmt.Printf("%0*b (в десятичной: %d)\n", width, result, result) // width подставляется вместо *
 
 }
