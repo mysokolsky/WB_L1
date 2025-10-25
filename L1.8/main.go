@@ -14,6 +14,128 @@
 
 package main
 
+import (
+	"errors"
+	"fmt"
+	"unsafe"
+	// "golang.org/x/text/number"
+)
+
+func cls() {
+	fmt.Println("\033[H\033[2J")
+}
+
+func insertOneBit(number int64, position uint8) int64 {
+	var sign int64 = 1
+	if number < 0 {
+		number = -number
+		sign = -1
+	}
+	number |= 1 << position
+	return number * sign
+}
+
+func insertZeroBit(number int64, position uint8) int64 {
+	var sign int64 = 1
+	if number < 0 {
+		number = -number
+		sign = -1
+	}
+	number &^= 1 << position
+	return number * sign
+}
+
+func inputNumber() int64 {
+	var number int64
+	var err error = errors.New("not nil")
+	cls()
+	for err != nil {
+		fmt.Println("Введите число в двоичной форме, можно с минусом. Например, -010011:")
+		_, err = fmt.Scanf("%b", &number)
+		if err != nil {
+			cls()
+			fmt.Println("Ошибка ввода")
+		}
+	}
+	return number
+}
+
+func inputPosition() uint8 {
+	var position uint8
+	var err error = errors.New("not nil")
+	for position > 62 || err != nil {
+		fmt.Println("Введите номер перезаписываемого бита (от 0 до 62 справа налево):")
+		_, err = fmt.Scanf("%d", &position)
+		if err != nil || position > 62 {
+			cls()
+			fmt.Println("\nОшибка ввода")
+		}
+	}
+	return position
+}
+
+func inputBit() bool {
+	var bit bool
+	var digit uint8
+	var err error = errors.New("not nil")
+	for digit > 1 || err != nil {
+		fmt.Println("\nВыберите бит 0 или 1 для записи:")
+		_, err = fmt.Scanf("%d", &digit)
+		if err != nil || digit > 1 {
+			cls()
+			fmt.Println("Ошибка ввода")
+		}
+	}
+	if digit > 0 {
+		bit = true
+	}
+	return bit
+}
+
+func printOutput(bit bool, position uint8, number int64) {
+
+}
+
+func input() (int64, uint8, bool) {
+
+	number := inputNumber()
+	cls()
+	fmt.Printf("\nЧисло: %064b (в десятичной: %d)\n", number, number)
+
+	position := inputPosition()
+	cls()
+	fmt.Printf("         Номер бита: %*v (%dй бит)\n", 64-position, "v", position)
+	fmt.Printf("              Число: %064b\n", number)
+
+	bit := inputBit()
+	cls()
+	pos_bit := 64 - position
+	digit := 0
+	if bit {
+		digit = 1
+	}
+
+	println()
+	fmt.Printf("     Бит - 0 или 1: %*d\n", pos_bit, digit)
+	fmt.Printf("        Номер бита: %*v (%dй бит)\n", pos_bit, "v", position)
+	fmt.Printf("             Число: %064b\n", number)
+
+	return number, position, bit
+}
+
 func main() {
-	println("Hello!")
+
+	number, position, bit := input()
+
+	if bit {
+		number = insertOneBit(number, position)
+	} else {
+		number = insertZeroBit(number, position)
+	}
+
+	fmt.Printf("Итоговый результат: ")
+
+	width := int(unsafe.Sizeof(number) * 8) // width - ширина числа в количестве бит. Для int64 ширина width = 64
+	fmt.Printf("%0*b\n", width, number)     // width подставляется вместо *
+
 }
