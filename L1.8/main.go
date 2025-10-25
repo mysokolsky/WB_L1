@@ -18,8 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"unsafe"
-	// "golang.org/x/text/number"
 )
+
+type Number struct {
+	number   int64
+	position uint8
+	bit      bool
+}
 
 func cls() {
 	fmt.Println("\033[H\033[2J")
@@ -92,50 +97,51 @@ func inputBit() bool {
 	return bit
 }
 
-func printOutput(bit bool, position uint8, number int64) {
-
-}
-
-func input() (int64, uint8, bool) {
-
-	number := inputNumber()
+func (num *Number) printOutput() {
 	cls()
-	fmt.Printf("\nЧисло: %064b (в десятичной: %d)\n", number, number)
-
-	position := inputPosition()
-	cls()
-	fmt.Printf("         Номер бита: %*v (%dй бит)\n", 64-position, "v", position)
-	fmt.Printf("              Число: %064b\n", number)
-
-	bit := inputBit()
-	cls()
-	pos_bit := 64 - position
+	println()
+	pos_bit := 64 - num.position
 	digit := 0
-	if bit {
+	if num.bit {
 		digit = 1
 	}
-
-	println()
 	fmt.Printf("     Бит - 0 или 1: %*d\n", pos_bit, digit)
-	fmt.Printf("        Номер бита: %*v (%dй бит)\n", pos_bit, "v", position)
-	fmt.Printf("             Число: %064b\n", number)
+	fmt.Printf("        Номер бита: %*v (%dй бит)\n", pos_bit, "v", num.position)
+	fmt.Printf("             Число: %064b (в десятичной: %d)\n", num.number, num.number)
+}
 
-	return number, position, bit
+func (num *Number) input() {
+
+	num.number = inputNumber()
+	cls()
+	fmt.Printf("\nЧисло: %064b (в десятичной: %d)\n", num.number, num.number)
+
+	num.position = inputPosition()
+	cls()
+	fmt.Printf("         Номер бита: %*v (%dй бит)\n", 64-num.position, "v", num.position)
+	fmt.Printf("              Число: %064b\n", num.number)
+
+	num.bit = inputBit()
+	cls()
+
+	num.printOutput()
 }
 
 func main() {
 
-	number, position, bit := input()
+	var num Number
+	num.input()
+	var result int64
 
-	if bit {
-		number = insertOneBit(number, position)
+	if num.bit {
+		result = insertOneBit(num.number, num.position)
 	} else {
-		number = insertZeroBit(number, position)
+		result = insertZeroBit(num.number, num.position)
 	}
 
 	fmt.Printf("Итоговый результат: ")
 
-	width := int(unsafe.Sizeof(number) * 8) // width - ширина числа в количестве бит. Для int64 ширина width = 64
-	fmt.Printf("%0*b\n", width, number)     // width подставляется вместо *
+	width := int(unsafe.Sizeof(result) * 8) // width - ширина числа в количестве бит. Для int64 ширина width = 64
+	fmt.Printf("%0*b\n", width, result)     // width подставляется вместо *
 
 }
