@@ -84,7 +84,6 @@ GITBRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 # настроенный upstream позволит писать короткие команды git push и git pull без указания origin
 HAS_UPSTREAM := $(shell git config --get branch.$(GITBRANCH).remote)
 
-
 # Цель, которая выполняет настройку только если она нужна
 set_upstream:
 ifeq ($(HAS_UPSTREAM),)
@@ -115,7 +114,7 @@ push: add set_upstream
 # автоматическая загрузка с гит-репозитория на текущую машину
 pull:
 	git stash
-	git pull origin $(GITBRANCH)
+	git pull
 
 ###############################################################################
 ##                                                                           ##
