@@ -17,8 +17,91 @@
 
 // Решение:
 
+// Реализуем такую схему работы:
+//
+//     Инициализация
+//        массива
+//           |
+//           v
+//      Наполнение         arrayUploader
+//        массива               |
+//           |                  |
+//           v                  v
+//   Чтение из массива       producer
+//   Запись в 1й канал      (горутина)
+//           |                  |
+//           v                  |
+//  Чтение из 1го канала        v
+//  Преобразование данных    operator
+//   Запись во 2й канал     (горутина)
+//           |                  |
+//           v                  v
+//  Чтение из 2го канала     printer
+//    Печать в консоль      (горутина)
+
 package main
 
+import (
+	"fmt"
+	"math/rand"
+	"sync"
+)
+
+var wg sync.WaitGroup
+var mas [100]int
+
+// наполнение массива данными
+func arrayUploader() {
+	for i := range mas {
+		mas[i] = rand.Intn(100)
+	}
+}
+
+// считывание из массива и запись данных в 1й канал
+func producer(ch1 chan<- int) {
+	defer wg.Done()
+	for _, value := range mas {
+		ch1 <- value
+	}
+	close(ch1)
+}
+
+// считывание из 1го канала, преобразование и запись данных во 2й канал
+func operator(ch1 <-chan int, ch2 chan<- int) {
+
+	defer wg.Done()
+	for value := range ch1 {
+		ch2 <- 2 * value
+	}
+	close(ch2)
+
+}
+
+// вывод данных из 2го канала на консоль
+func printer(ch2 <-chan int) {
+	defer wg.Done()
+	i := 0
+	for value := range ch2 {
+		fmt.Printf("%d\t: %v\n", i, value)
+		i++
+	}
+
+}
+
 func main() {
-	println("Hello!")
+
+	arrayUploader() // заполнение массива
+
+	fmt.Printf("\nПервоначальный массив:\n%+v\n", mas)
+
+	ch1 := make(chan int, 1)
+	ch2 := make(chan int, 1)
+
+	wg.Add(3)
+	go printer(ch2)       // вывод данных из 2го канала на консоль
+	go operator(ch1, ch2) // считывание из 1го канала, преобразование и запись данных во 2й канал
+	go producer(ch1)      // считывание из массива и запись данных в 1й канал
+
+	defer wg.Wait()
+
 }
