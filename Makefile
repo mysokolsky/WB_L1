@@ -79,6 +79,19 @@ create-repo:
 # Определяем ветку для автоматического пуша
 GITBRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 
+# Получаем данные, настроен ли remote для текущей ветки
+# Если HAS_UPSTREAM пуст, значит upstream не настроен
+# настроенный upstream позволит писать короткие команды git push и git pull без указания origin
+HAS_UPSTREAM := $(shell git config --get branch.$(GIT_BRANCH).remote)
+
+
+# Цель, которая выполняет настройку только если она нужна
+set_upstream:
+ifeq ($(HAS_UPSTREAM),)
+	@echo "Upstream не настроен для ветки $(GIT_BRANCH). Настраиваем..."
+	@git push --set-upstream origin $(GIT_BRANCH)
+endif
+
 # Дальше цели для работы с гитом
 add:
 	@git add "$(LAST_TASK)"; sleep 1
@@ -91,12 +104,12 @@ add:
 commit:
 	@git commit -m "=== $(LAST_TASK) == $(GITBRANCH) === $(shell date +'ДАТА %d-%m-%y === ВРЕМЯ %H:%M:%S') ====="; sleep 1
 
-push: add 
+push: add set_upstream
 	@if git diff --cached --quiet; then \
 		echo "Нет изменений для сохранения."; \
 	else \
 		$(MAKE) commit; \
-		git push origin $(GITBRANCH); \
+		git push; \
 	fi
 
 # автоматическая загрузка с гит-репозитория на текущую машину
