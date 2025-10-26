@@ -28,6 +28,8 @@ func recognize(v interface{}) {
 		fmt.Printf("\nЭто переменная типа %T: %t", v, v)
 	case chan int:
 		fmt.Printf("\nЭто канал типа: %T", v)
+	default:
+		fmt.Printf("\nНеизвестный тип %T: %v", v, v)
 	}
 
 }
@@ -37,4 +39,5 @@ func main() {
 	recognize("слово")
 	recognize(true)
 	recognize(make(chan int))
+	recognize(123.45)
 }
