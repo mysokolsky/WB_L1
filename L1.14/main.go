@@ -29,7 +29,7 @@ func recognize(v interface{}) {
 	case chan int:
 		fmt.Printf("\nЭто канал типа: %T", v)
 	default:
-		fmt.Printf("\nНеизвестный тип %T: %v", v, v)
+		fmt.Printf("\nДругой тип - %T: %v", v, v)
 	}
 
 }
