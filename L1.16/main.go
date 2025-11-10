@@ -34,17 +34,11 @@ package main
 
 import "fmt"
 
-type SortObj struct {
-	mas    []int
-	left   int
-	right  int
-	center int
-	pivot  int
-}
-
 var mas = []int{1, 5, 3, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
 
-func getPivot(mas []int, left, right int) int {
+var counter = 0
+
+func Median(left, right int) int {
 	center := (left + right) / 2
 	if mas[left] > mas[center] {
 		mas[left], mas[center] = mas[center], mas[left]
@@ -56,15 +50,60 @@ func getPivot(mas []int, left, right int) int {
 	return pivot
 }
 
-func Sort(mas []int, left, right int) {
+func Sort(left, right int) {
+
+	i := left
+	j := right
+
+	pivot := Median(left, right)
+
+	if counter == 0 {
+		fmt.Println("pivot = ", pivot)
+		fmt.Printf("%+v\n", mas)
+	}
+	counter++
+
+	if right-left < 1 {
+		return
+	}
+
+	for i < j {
+		for {
+			if mas[i] > pivot {
+				break
+			}
+			i++
+		}
+
+		for {
+			if mas[j] < pivot {
+				break
+			}
+			j--
+		}
+		if i < j {
+			mas[i], mas[j] = mas[j], mas[i]
+			i++
+			j--
+
+			fmt.Printf("%+v\n", mas)
+		}
+
+	}
+	if i >= j {
+		fmt.Println("Рекурсия")
+		Sort(left, i)
+		Sort(j+1, right)
+	}
 
 }
 
 func quickSort(mas []int) []int {
-	pivot := getPivot(mas, 0, len(mas)-1)
+	Sort(0, len(mas)-1)
 	return mas
 }
 
 func main() {
-	fmt.Printf("%+v", quickSort(mas))
+	fmt.Printf("%+v\n", mas)
+	fmt.Printf("%+v\n", quickSort(mas))
 }
