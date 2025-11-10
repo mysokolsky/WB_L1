@@ -34,11 +34,35 @@ package main
 
 import "fmt"
 
+type SortObj struct {
+	mas    []int
+	left   int
+	right  int
+	center int
+	pivot  int
+}
+
 var mas = []int{1, 5, 3, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
 
-func quickSort([]int) []int {
+func getPivot(mas []int, left, right int) int {
+	center := (left + right) / 2
+	if mas[left] > mas[center] {
+		mas[left], mas[center] = mas[center], mas[left]
+	}
+	if mas[center] > mas[right] {
+		mas[right], mas[center] = mas[center], mas[right]
+	}
+	pivot := mas[center]
+	return pivot
+}
 
-	return []int{}
+func Sort(mas []int, left, right int) {
+
+}
+
+func quickSort(mas []int) []int {
+	pivot := getPivot(mas, 0, len(mas)-1)
+	return mas
 }
 
 func main() {
