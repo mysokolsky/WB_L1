@@ -30,5 +30,5 @@ func binSearch(mas []int, target int) int {
 }
 
 func main() {
-	fmt.Println(binSearch(mas, 0))
+	fmt.Println(binSearch(mas, -7))
 }
