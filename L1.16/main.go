@@ -34,7 +34,7 @@ package main
 
 import "fmt"
 
-var mas = []int{1, 5, 3, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
+var mas = []int{1, 5, 33, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
 
 var counter = 0
 
@@ -46,54 +46,78 @@ func Median(left, right int) int {
 	if mas[center] > mas[right] {
 		mas[right], mas[center] = mas[center], mas[right]
 	}
+	if mas[left] > mas[center] {
+		mas[left], mas[center] = mas[center], mas[left]
+	}
 	pivot := mas[center]
 	return pivot
 }
 
 func Sort(left, right int) {
+	defer func() {
+		fmt.Printf("---------- Выход из цикла рекурсии %v -----------", counter)
+		counter--
+	}()
+	counter++
+	fmt.Printf("---------- Вход в цикл рекурсии %v -----------", counter)
+
+	fmt.Println("Левая граница left = ", left)
+	fmt.Println("Правая граница right = ", right)
+	fmt.Printf("Массив для упорядочивания\n%+v\n", mas[left:right+1])
+
+	if right-left < 2 {
+		if right-left == 1 {
+			if mas[left] > mas[right] {
+				mas[left], mas[right] = mas[right], mas[left]
+			}
+		}
+		return
+	}
+
+	pivot := Median(left, right)
+	fmt.Printf("Массив после медианы\n%+v\n", mas[left:right+1])
+	if right-left == 2 {
+		return
+	}
+
+	fmt.Println("pivot = ", pivot)
 
 	i := left
 	j := right
 
-	pivot := Median(left, right)
-
-	if counter == 0 {
-		fmt.Println("pivot = ", pivot)
-		fmt.Printf("%+v\n", mas)
-	}
-	counter++
-
-	if right-left < 1 {
-		return
-	}
-
 	for i < j {
-		for {
-			if mas[i] > pivot {
-				break
-			}
+
+		fmt.Printf("i = %v, j = %v\n", i, j)
+
+		for mas[i] <= pivot {
 			i++
 		}
-
-		for {
-			if mas[j] < pivot {
-				break
-			}
+		for mas[j] >= pivot && i < j {
 			j--
 		}
 		if i < j {
+
+			fmt.Printf("Меняем элементы по индексам i = %v, j = %v\n", i, j)
+
 			mas[i], mas[j] = mas[j], mas[i]
-			i++
-			j--
-
-			fmt.Printf("%+v\n", mas)
+			fmt.Printf("%+v\n", mas[left:right+1])
 		}
-
+		fmt.Scanln()
 	}
-	if i >= j {
-		fmt.Println("Рекурсия")
-		Sort(left, i)
-		Sort(j+1, right)
+
+	fmt.Printf("i = %v, j = %v\n", i, j)
+	fmt.Println("Рекурсия")
+
+	if j-1 > left {
+		fmt.Println("Сортировка левой части. Индексы:", left, "-", j-1)
+		fmt.Printf("Массив для сортировки:\n%+v\n", mas[left:j])
+		Sort(left, j-1)
+	}
+
+	if j < right {
+		fmt.Println("Сортировка правой части. Индексы:", j, "-", right)
+		fmt.Printf("Массив для сортировки:\n%+v\n", mas[j:right+1])
+		Sort(j, right)
 	}
 
 }
