@@ -34,11 +34,10 @@ package main
 
 import "fmt"
 
-var mas = []int{1, 5, 33, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
-
 var counter = 0
+var atom = 0
 
-func Median(left, right int) int {
+func Median(mas []int, left, right int) int {
 	center := (left + right) / 2
 	if mas[left] > mas[center] {
 		mas[left], mas[center] = mas[center], mas[left]
@@ -53,13 +52,22 @@ func Median(left, right int) int {
 	return pivot
 }
 
-func Sort(left, right int) {
+// используем для сортировки алгоритм Хоара
+func Sort(mas []int, left, right int) error {
+	if left > right {
+		return fmt.Errorf("Неверные границы массива")
+	}
+
+	atom++
+
+	fmt.Printf(">>>>>> %v <<<<<<<\n", atom)
+
 	defer func() {
-		fmt.Printf("---------- Выход из цикла рекурсии %v -----------", counter)
+		fmt.Printf("---------- Выход из цикла рекурсии %v -----------\n", counter)
 		counter--
 	}()
 	counter++
-	fmt.Printf("---------- Вход в цикл рекурсии %v -----------", counter)
+	fmt.Printf("---------- Вход  в  цикл  рекурсии %v -----------\n", counter)
 
 	fmt.Println("Левая граница left = ", left)
 	fmt.Println("Правая граница right = ", right)
@@ -71,13 +79,14 @@ func Sort(left, right int) {
 				mas[left], mas[right] = mas[right], mas[left]
 			}
 		}
-		return
+		return nil
 	}
 
-	pivot := Median(left, right)
+	pivot := Median(mas, left, right)
 	fmt.Printf("Массив после медианы\n%+v\n", mas[left:right+1])
+
 	if right-left == 2 {
-		return
+		return nil
 	}
 
 	fmt.Println("pivot = ", pivot)
@@ -85,22 +94,24 @@ func Sort(left, right int) {
 	i := left
 	j := right
 
-	for i < j {
+	for i <= j {
 
 		fmt.Printf("i = %v, j = %v\n", i, j)
 
-		for mas[i] <= pivot {
+		for mas[i] < pivot {
 			i++
 		}
-		for mas[j] >= pivot && i < j {
+		for mas[j] > pivot {
 			j--
 		}
-		if i < j {
+		if i <= j {
 
 			fmt.Printf("Меняем элементы по индексам i = %v, j = %v\n", i, j)
 
 			mas[i], mas[j] = mas[j], mas[i]
-			fmt.Printf("%+v\n", mas[left:right+1])
+			i++
+			j--
+			fmt.Printf("Массив с переставленными элементами:\n%+v\n", mas[left:right+1])
 		}
 		fmt.Scanln()
 	}
@@ -108,26 +119,31 @@ func Sort(left, right int) {
 	fmt.Printf("i = %v, j = %v\n", i, j)
 	fmt.Println("Рекурсия")
 
-	if j-1 > left {
-		fmt.Println("Сортировка левой части. Индексы:", left, "-", j-1)
-		fmt.Printf("Массив для сортировки:\n%+v\n", mas[left:j])
-		Sort(left, j-1)
+	if left < j {
+		fmt.Println("Сортировка левой части. Индексы:", left, "-", j)
+		fmt.Printf("Массив для сортировки:\n%+v\n", mas[left:j+1])
+		Sort(mas, left, j)
 	}
 
-	if j < right {
-		fmt.Println("Сортировка правой части. Индексы:", j, "-", right)
-		fmt.Printf("Массив для сортировки:\n%+v\n", mas[j:right+1])
-		Sort(j, right)
+	if i < right {
+		fmt.Println("Сортировка правой части. Индексы:", i, "-", right)
+		fmt.Printf("Массив для сортировки:\n%+v\n", mas[i:right+1])
+		Sort(mas, i, right)
 	}
-
+	return nil
 }
 
 func quickSort(mas []int) []int {
-	Sort(0, len(mas)-1)
+	if err := Sort(mas, 0, len(mas)-1); err != nil {
+		fmt.Println(err)
+	}
 	return mas
 }
 
 func main() {
+
+	var mas = []int{1, 5, 33, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
+
 	fmt.Printf("%+v\n", mas)
 	fmt.Printf("%+v\n", quickSort(mas))
 }
