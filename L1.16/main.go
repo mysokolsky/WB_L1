@@ -54,13 +54,13 @@ func Median(mas []int, left, right int) int {
 
 // используем для сортировки алгоритм Хоара
 func Sort(mas []int, left, right int) error {
-	if left > right {
+	if left > right || left < 0 || right < 0 {
 		return fmt.Errorf("Неверные границы массива")
 	}
 
 	atom++
 
-	fmt.Printf(">>>>>> %v <<<<<<<\n", atom)
+	fmt.Printf(">>>>>> Итерация №%v <<<<<<<\n", atom)
 
 	defer func() {
 		fmt.Printf("---------- Выход из цикла рекурсии %v -----------\n", counter)
