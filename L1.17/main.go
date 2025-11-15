@@ -20,6 +20,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/mysokolsky/WB_L1/L1.16"
 )
 
 var mas = []int{1, 5, 33, 9, 0, -1, 0, 4, -7, 2, 5, 23, -99, 1000, -6, 3}
@@ -34,5 +35,6 @@ func binSearch(mas []int, target int) int {
 }
 
 func main() {
+	fmt.Printf("%+v", QuickSort(mas))
 	fmt.Println(binSearch(mas, -7))
 }
