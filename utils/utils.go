@@ -1,6 +1,8 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var counter = 0
 var atom = 0
@@ -110,26 +112,38 @@ func QuickSort(mas []int, left, right int) error {
 // Бинарный поиск числа в отсортированном ряде чисел
 // На вход принимает указатель на слайс mas, служебную переменную offset первого индекса ряда (обычно это 0), и искомое число target
 // На выход отправляет индекс найденного числа (первого попавшегося если такое число в слайсе не одно, а не первого от начала слайса) или -1 если число не нашлось
-func BinSearch(mas []int, offset, target int) int {
+func BinSearch(mas []int, target int) int {
 
 	// если target не найден, то:
 	if len(mas) == 0 {
 		return -1
 	}
 
-	middle := (len(mas) - 1) / 2
+	left := 0
+	right := len(mas) - 1
 
-	fmt.Printf("%+v\n", mas)
-	println("Индекс среднего:", middle)
-	println("Смещение:", offset)
-	// println(target)
+	for {
 
-	if mas[middle] == target {
-		return offset + middle
-	} else if mas[middle] < target {
-		offset += middle + 1
-		return BinSearch(mas[middle+1:], offset, target)
-	} else {
-		return BinSearch(mas[:middle], offset, target) // элемент middle не включён в подслайс
+		if right-left == 0 {
+			return -1
+		}
+
+		middle := (right + left) / 2
+		offset := (right - left) / 2
+
+		// fmt.Printf("%+v\n", mas[left:right+1])
+		println("Индекс среднего:", middle)
+		println("Левый край left =", left)
+		println("Правый край right =", right)
+		fmt.Printf("%+v\n", mas[left:right+1])
+
+		if mas[middle] == target {
+			return middle
+		} else if mas[middle] < target {
+			left += offset + 1
+		} else {
+			right -= offset
+		}
 	}
+
 }

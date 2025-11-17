@@ -26,7 +26,7 @@ import (
 )
 
 func binSearch(mas []int, target int) int {
-	return utils.BinSearch(mas, 0, target)
+	return utils.BinSearch(mas, target)
 }
 
 func main() {
