@@ -25,19 +25,32 @@ import (
 	"github.com/mysokolsky/WB_L1/utils"
 )
 
-var mas = []int{0, 100, -9, 5, 33, 9, 0, -1, 10, 34, -71, -2, -5, 23, -99, 17, 6, 0, 0, -1}
-
 func binSearch(mas []int, target int) int {
-	for index, value := range mas {
-		if value == target {
-			return index
-		}
-	}
-	return -1
+	return utils.BinSearch(mas, 0, target)
 }
 
 func main() {
-	utils.QuickSort(mas, 0, len(mas)-1)
+
+	// слайс для поиска
+	var mas = []int{0, 100, -9, 5, 33, 9, 0, -1, 10, 34, -71, -2, -5, 23, -99, 17, 6, 0, 0, -1}
+	// var mas = []int{17}
+	// var mas = []int{17, 17, 17, 17, 18, 19, 20}
+	// var mas = []int{0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 18, 0}
+	// var mas = []int{}
+
+	target := 17 // искомое число в слайсе
+
+	utils.QuickSort(mas, 0, len(mas)-1) // сортировка слайса
+
+	println("Поиск значения", target, "в сортированном ряде чисел:")
 	fmt.Printf("%+v\n", mas)
-	fmt.Println(binSearch(mas, -7))
+
+	result := binSearch(mas, target)
+	println("Результат поиска:")
+	if result == -1 {
+		fmt.Printf("Число %v в слайсе не найдено\n", target)
+	} else {
+		fmt.Printf("Число %v найдено в слайсе по индексу: %v\n", target, result)
+	}
+
 }

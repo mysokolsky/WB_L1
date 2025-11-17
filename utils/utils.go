@@ -5,7 +5,8 @@ import "fmt"
 var counter = 0
 var atom = 0
 
-// сортировка левого, среднего и правого элементов и возвращение среднего
+// Служебная функция. Нужна для Quick Sort
+// Сортировка крайнего левого, среднего и крайнего правого элементов и возвращение среднего
 func median(mas []int, left, right int) int {
 	center := (left + right) / 2
 	if mas[left] > mas[center] {
@@ -21,7 +22,10 @@ func median(mas []int, left, right int) int {
 	return pivot
 }
 
-// Быстрая сортировка по алгоритму Хоара
+// Метод сортировки Quick Sort по алгоритму Хоара
+// Функция принимает указатель на слайс, а так же диапазон для сортировки в виде крайнего левого и крайнего правого индексов внутри слайса.
+// И сортирует элементы внутри слайса по возрастанию
+// Возвращает ошибку, если проблема с диапазоном входных крайних индексов. Если вернула nil, значит слайс удалось отсортировать
 func QuickSort(mas []int, left, right int) error {
 	if left > right || left < 0 || right < 0 {
 		return fmt.Errorf("Ошибка: для сортировки переданы неверные границы массива. ЛЕВАЯ: %v, ПРАВАЯ: %v", left, right)
@@ -83,7 +87,7 @@ func QuickSort(mas []int, left, right int) error {
 			j--
 
 		}
-		// fmt.Scanln()
+		// fmt.Scanln() // отладочная пауза по Enter(Command)
 	}
 
 	fmt.Printf("Пересечение: левый сканер на элементе %v, правый %v\n", i, j)
@@ -101,4 +105,31 @@ func QuickSort(mas []int, left, right int) error {
 		QuickSort(mas, i, right)
 	}
 	return nil
+}
+
+// Бинарный поиск числа в отсортированном ряде чисел
+// На вход принимает указатель на слайс mas, служебную переменную offset первого индекса ряда (обычно это 0), и искомое число target
+// На выход отправляет индекс найденного числа (первого попавшегося если такое число в слайсе не одно, а не первого от начала слайса) или -1 если число не нашлось
+func BinSearch(mas []int, offset, target int) int {
+
+	// если target не найден, то:
+	if len(mas) == 0 {
+		return -1
+	}
+
+	middle := (len(mas) - 1) / 2
+
+	fmt.Printf("%+v\n", mas)
+	println("Индекс среднего:", middle)
+	println("Смещение:", offset)
+	// println(target)
+
+	if mas[middle] == target {
+		return offset + middle
+	} else if mas[middle] < target {
+		offset += middle + 1
+		return BinSearch(mas[middle+1:], offset, target)
+	} else {
+		return BinSearch(mas[:middle], offset, target) // элемент middle не включён в подслайс
+	}
 }
