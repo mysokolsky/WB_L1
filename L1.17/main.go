@@ -38,6 +38,6 @@ func binSearch(mas []int, target int) int {
 
 func main() {
 	utils.QuickSort(mas, 0, len(mas)-1)
-	fmt.Printf("%+v/n", mas)
+	fmt.Printf("%+v\n", mas)
 	fmt.Println(binSearch(mas, -7))
 }
