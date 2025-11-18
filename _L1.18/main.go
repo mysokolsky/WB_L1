@@ -13,6 +13,13 @@
 
 package main
 
+import "sync"
+
+type ConcurrentCounter struct {
+	counter int
+	mute    sync.Mutex
+}
+
 func main() {
 
 }

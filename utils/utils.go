@@ -29,7 +29,7 @@ func median(mas []int, left, right int) int {
 // И сортирует элементы внутри слайса по возрастанию
 // Возвращает ошибку, если проблема с диапазоном входных крайних индексов. Если вернула nil, значит слайс удалось отсортировать
 func QuickSort(mas []int, left, right int) error {
-	if left > right || left < 0 || right < 0 {
+	if left > right || left < 0 || right < 0 || right >= len(mas) {
 		return fmt.Errorf("Ошибка: для сортировки переданы неверные границы массива. ЛЕВАЯ: %v, ПРАВАЯ: %v", left, right)
 	}
 
