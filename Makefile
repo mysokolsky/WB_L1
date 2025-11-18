@@ -114,7 +114,7 @@ push: add set_upstream
 		git push; \
 	fi
 
-push_all:
+push_all: set_upstream
 	@git add .
 	@$(MAKE) commit
 	@git push
