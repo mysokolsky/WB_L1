@@ -114,6 +114,11 @@ push: add set_upstream
 		git push; \
 	fi
 
+push_all:
+	git add .
+	$(MAKE) commit
+	git push
+
 # автоматическая загрузка с гит-репозитория на текущую машину
 pull:
 	git stash
