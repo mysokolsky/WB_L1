@@ -22,7 +22,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/mysokolsky/WB_L1/utils"
+	"github.com/mysokolsky/WB_L1/utils" // необходимо загрузить утилиты в консоли из папки проекта командой go get github.com/mysokolsky/WB_L1/utils
 )
 
 func binSearch(mas []int, target int) int {

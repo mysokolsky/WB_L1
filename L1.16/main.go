@@ -27,7 +27,7 @@
 package main
 
 import "fmt"
-import "github.com/mysokolsky/WB_L1/utils"
+import "github.com/mysokolsky/WB_L1/utils" // необходимо загрузить утилиты в консоли из папки проекта командой go get github.com/mysokolsky/WB_L1/utils
 
 func quickSort(mas []int) []int {
 	if err := utils.QuickSort(mas, 0, len(mas)-1); err != nil {
