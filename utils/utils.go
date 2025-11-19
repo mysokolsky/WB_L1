@@ -156,3 +156,31 @@ func BinSearch(mas []int, target int) int {
 	}
 
 }
+
+// Зеркальное отражение слайса.
+// Первые элементы становятся последними и наоборот
+func flipInt32Slice(mas []rune, left, right int) {
+
+	i := left
+	j := right
+	for i < j {
+		mas[i], mas[j] = mas[j], mas[i]
+		i++
+		j--
+	}
+}
+
+// разворот слов разделённых пробелами, например
+// "собака лает очень громко!" -> "громко! очень лает собака"
+func flipWords(mas []rune) {
+
+	prevSpace := 0
+
+	for i := 0; i < len(mas); i++ {
+		if mas[i] == ' ' {
+			flipInt32Slice(mas, prevSpace, i-1)
+			prevSpace = i + 1
+		}
+	}
+	flipInt32Slice(mas, prevSpace, len(mas)-1) // последнее слово
+}
