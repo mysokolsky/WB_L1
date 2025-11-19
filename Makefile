@@ -97,7 +97,7 @@ endif
 
 # Дальше цели для работы с гитом
 add:
-	@git add "$(LAST_TASK)" go.mod go.sum; sleep 1
+	@git add "$(LAST_TASK)" go.mod go.su; sleep 1
 	@for f in *; do \
 		if [ -f "$$f" ]; then \
 			git add "$$f" 2>/dev/null || true; \
