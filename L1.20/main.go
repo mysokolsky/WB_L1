@@ -21,6 +21,7 @@ import "github.com/mysokolsky/WB_L1/utils" // необходимо загруз�
 func main() {
 
 	str := "собака лает очень громко!"
+	fmt.Printf("%+v\n", str)
 
 	strExt := []rune(str)
 
