@@ -33,8 +33,9 @@ endif
 endif
 
 # Автоматическая цель для запуска проекта в папке LAST_TASK
-run: init_new_task
-	@cd $(LAST_TASK) && go run .
+run: #init_new_task
+	@go run ./$(LAST_TASK)
+# 	@cd $(LAST_TASK) && go run .
 
 ###############################################################################
 ##                                                                           ##
@@ -96,7 +97,7 @@ endif
 
 # Дальше цели для работы с гитом
 add:
-	@git add "$(LAST_TASK)"; sleep 1
+	@git add "$(LAST_TASK) go.mod go.sum"; sleep 1
 	@for f in *; do \
 		if [ -f "$$f" ]; then \
 			git add "$$f" 2>/dev/null || true; \
@@ -139,12 +140,12 @@ skip_attention:
 	git config advice.addIgnoredFile false
 
 # инициализировать голанг-проект в папке последнего задания
-init_new_task:
-	@if [ ! -f $(LAST_TASK)/go.mod ]; then \
-		echo "go.mod не найден, инициализируем новый проект..."; \
-		echo; \
-		cd $(LAST_TASK) && { \
-			go mod init github.com/mysokolsky/$(REPO_NAME)/$(LAST_TASK) > /dev/null 2>&1; \
-			go mod tidy  > /dev/null 2>&1; \
-		}; \
-	fi
+# init_new_task:
+# 	@if [ ! -f $(LAST_TASK)/go.mod ]; then \
+# 		echo "go.mod не найден, инициализируем новый проект..."; \
+# 		echo; \
+# 		cd $(LAST_TASK) && { \
+# 			go mod init github.com/mysokolsky/$(REPO_NAME)/$(LAST_TASK) > /dev/null 2>&1; \
+# 			go mod tidy  > /dev/null 2>&1; \
+# 		}; \
+# 	fi
