@@ -24,9 +24,9 @@ func main() {
 
 	strExt := []rune(str)
 
-	utils.flipInt32Slice(strExt, 0, len(strExt)-1)
+	utils.FlipInt32Slice(strExt, 0, len(strExt)-1)
 
-	utils.flipWords(strExt)
+	utils.FlipWords(strExt)
 
 	fmt.Printf("%+v", string(strExt))
 
