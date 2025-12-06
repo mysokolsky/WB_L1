@@ -15,25 +15,37 @@ package main
 import (
 	"fmt"
 	"math/big"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/result"
 )
 
-type BigNum struct {
+type BigNumPair struct {
+	num1 interface{}
+	num2 interface{}
 }
 
-// func NumToString(num interface{}) string{
+func NumToString(num interface{}) string {
+	return fmt.Sprint(num)
+}
 
-// }
+func convertToBig(s string) *big.Float {
 
-func Add(num1, num2 interface{}) string {
-	var result string
+	result, _ := new(big.Float).SetString(s)
 
 	return result
 }
 
+func Add(num1, num2 *big.Float) *big.Float {
+
+	return new(big.Float).Add(num1, num2)
+}
+
 func main() {
-	f1 := big.NewFloat(0)
-	f1.SetString("3.14159265358979323846") // High-precision pi
-	f2 := big.NewFloat(2)
-	result := new(big.Float).Mul(f1, f2)
+	var f1 float64 = 3
+	var f2 int = -1
+
+	result := Add(s1, s2)
+
 	fmt.Println(result)
+
 }
