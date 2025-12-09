@@ -15,24 +15,30 @@ package main
 import (
 	"fmt"
 	"math/big"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/result"
 )
 
-type BigNumPair struct {
-	num1 interface{}
-	num2 interface{}
+type BigFloatPair struct {
+	num1 *big.Float
+	num2 *big.Float
 }
 
-func NumToString(num interface{}) string {
-	return fmt.Sprint(num)
+type BigFloatPairSimpleArithmetics interface {
+	Add() *big.Float
+	Sub() *big.Float
+	Mul() *big.Float
+	// Div(num1, num2 interface{}) *big.Float
 }
 
-func convertToBig(s string) *big.Float {
+// type Adapter struct {
+// 	b *BigNum
+// }
 
-	result, _ := new(big.Float).SetString(s)
+func (b *BigFloatPair) Add() *big.Float {
+	return Add(b.num1, b.num2)
+}
 
-	return result
+func (b *BigFloatPair) Sub() *big.Float {
+	return Sub(b.num1, b.num2)
 }
 
 func Add(num1, num2 *big.Float) *big.Float {
@@ -40,11 +46,51 @@ func Add(num1, num2 *big.Float) *big.Float {
 	return new(big.Float).Add(num1, num2)
 }
 
-func main() {
-	var f1 float64 = 3
-	var f2 int = -1
+func Sub(num1, num2 *big.Float) *big.Float {
 
-	result := Add(s1, s2)
+	return new(big.Float).Sub(num1, num2)
+}
+
+func Mul(num1, num2 *big.Float) *big.Float {
+
+	return new(big.Float).Mul(num1, num2)
+}
+
+// func Div(num1, num2 *big.Float) *big.Float {
+
+// 	return new(big.Float).Div(num1, num2)
+// }
+
+func NumToString(num interface{}) string {
+	return fmt.Sprint(num)
+}
+
+func StringToBig(s string) *big.Float {
+
+	result, _ := new(big.Float).SetString(s)
+
+	return result
+}
+
+func NumToBigFloat(num interface{}) *big.Float {
+
+	str := NumToString(num)
+	b := StringToBig(str)
+
+	return b
+}
+
+func main() {
+	var n1 float64 = 3
+	var n2 int = -1
+
+	num1 := NumToBigFloat(n1)
+	num2 := NumToBigFloat(n2)
+	b := &BigFloatPair{num1, num2}
+
+	// adapter := &Adapter{b}
+
+	result := b.Add()
 
 	fmt.Println(result)
 
