@@ -20,6 +20,18 @@ import (
 type BigFloatPair struct {
 	num1 *big.Float
 	num2 *big.Float
+
+	result *big.Float
+}
+
+func NewBigFloatPair(n1, n2 interface{}) *BigFloatPair {
+
+	num1 := NumToBigFloat(n1)
+	num2 := NumToBigFloat(n2)
+
+	b := BigFloatPair{num1, num2, nil}
+
+	return &b
 }
 
 type BigFloatPairSimpleArithmetics interface {
@@ -30,15 +42,19 @@ type BigFloatPairSimpleArithmetics interface {
 }
 
 // type Adapter struct {
-// 	b *BigNum
+// 	b *BigFloatPair
 // }
 
-func (b *BigFloatPair) Add() *big.Float {
-	return Add(b.num1, b.num2)
+// func (a *Adapter) Add() {
+
+// }
+
+func (b *BigFloatPair) Add() {
+	b.result = Add(b.num1, b.num2)
 }
 
-func (b *BigFloatPair) Sub() *big.Float {
-	return Sub(b.num1, b.num2)
+func (b *BigFloatPair) Sub() {
+	b.result = Sub(b.num1, b.num2)
 }
 
 func Add(num1, num2 *big.Float) *big.Float {
@@ -56,10 +72,11 @@ func Mul(num1, num2 *big.Float) *big.Float {
 	return new(big.Float).Mul(num1, num2)
 }
 
-// func Div(num1, num2 *big.Float) *big.Float {
+func Div(num1, num2 *big.Float) *big.Float {
 
-// 	return new(big.Float).Div(num1, num2)
-// }
+	return new(big.Float).
+	//Div(num1, num2)
+}
 
 func NumToString(num interface{}) string {
 	return fmt.Sprint(num)
@@ -84,14 +101,10 @@ func main() {
 	var n1 float64 = 3
 	var n2 int = -1
 
-	num1 := NumToBigFloat(n1)
-	num2 := NumToBigFloat(n2)
-	b := &BigFloatPair{num1, num2}
+	b := NewBigFloatPair(n1, n2)
 
-	// adapter := &Adapter{b}
+	b.Add()
 
-	result := b.Add()
-
-	fmt.Println(result)
+	fmt.Println(b.result)
 
 }
