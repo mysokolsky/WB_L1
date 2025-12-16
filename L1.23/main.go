@@ -15,30 +15,57 @@
 package main
 
 import "fmt"
-import "slices"
 
-func dropSliceIndex(index int, mas []int) {
-	if index < 0 || index > len(mas)-1 {
-		fmt.Errorf("error: wrong index to delete")
-		return
+// Функция, в которой происходит удаление элемента.
+// На вход подаётся номер элемента и указатель на слайс.
+// Если в функцию передавать не указатель, изменения будут
+// происходить и с исходным слайсом, но длина length слайса не изменится.
+// При передаче указателя так же меняется и длина исходного слайса.
+func dropOneIndex(index int, mas *[]int) error {
+	if len(*mas) == 0 {
+		return fmt.Errorf("error: empty array")
 	}
-	if len(mas) == 0 {
-		fmt.Errorf("error: empty array")
-		return
+	if index < 0 || index > len(*mas)-1 {
+		return fmt.Errorf("error: wrong index number to delete")
 	}
+	// // 1 вариант - append
+	// // Только для использования с числами.
+	// // Потому что если будет слайс из указателей на структуры например
+	// // или на другие слайсы и т.п., то после удаления элемента все
+	// // элементы сдвинутся на один влево, а последний элемент останется
+	// // вне границ слайса и он будет содержит ссылку на данные в области
+	// // памяти. И сборщик мусора будет думать, что эта область памяти
+	// // ещё нужна и не очистит её сам. Возникнет утечка памяти до тех пор,
+	// // пока слайс не будет удалён.
+	// *mas = append((*mas)[:index], (*mas)[index+1:]...) // слайс автоматически меняет длину length меньше на 1 и очистить элемент в конце уже не получится
 
-	mas = append(mas[:index], mas[index+1:]...)
-	// mas = mas[:len(mas)]
-	fmt.Println(mas)
-	slices.Clip(mas)
-	fmt.Println(mas)
+	// // 2 вариант - copy
+	// // Работает быстрее append, в основном копирует данные напрямую
+	// // чаще всего без дополнительного выделения памяти.
+	// // После копирования не уменьшает автоматически параметр length слайса
+	// // и при выводе показывает, что в последнем элементе после копирования
+	// // ещё остались данные, которые не удалены.
+	// copy((*mas)[index:], (*mas)[index+1:]) // копируем элементы на позицию левее, затирая удаляемый элемент
+	// clear((*mas)[len(*mas)-1:]) // очищаем последний элемент
+	// *mas = (*mas)[:len(*mas)-1] // уменьшаем длину length слайса (но не уменьшаем capacity!!!)
 
+	// 3 вариант (начиная с go v 1.22 ) - Delete из библиотеки slices
+	return nil
 }
 
 func main() {
 	var mas = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	// var mas = []int{1}
+	// var mas = []int{}
+	fmt.Println("Массив до удаления элемента:", mas)
 
-	dropSliceIndex(5, mas)
-	fmt.Println(len(mas))
+	indexToDrop := 0
+	fmt.Println("Удалим элемент номер:", indexToDrop)
+
+	if err := dropOneIndex(indexToDrop, &mas); err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	fmt.Println(mas)
 }
