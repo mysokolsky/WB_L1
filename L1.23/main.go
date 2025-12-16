@@ -15,9 +15,10 @@
 package main
 
 import "fmt"
+import "slices"
 
 func dropSliceIndex(index int, mas []int) {
-	if index <0 || index>len(mas)-1 {
+	if index < 0 || index > len(mas)-1 {
 		fmt.Errorf("error: wrong index to delete")
 		return
 	}
@@ -26,19 +27,18 @@ func dropSliceIndex(index int, mas []int) {
 		return
 	}
 
-	for i:=index;i<len(mas);i++ {
-		if i<len(mas)-1 {
-		mas[i] = mas[i+1]
-	}
-
-	mas.
-	}
+	mas = append(mas[:index], mas[index+1:]...)
+	// mas = mas[:len(mas)]
+	fmt.Println(mas)
+	slices.Clip(mas)
+	fmt.Println(mas)
 
 }
 
-
 func main() {
-var mas = []int{0,1,2,3,4,5,6,7,8,9,10}
+	var mas = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
-
+	dropSliceIndex(5, mas)
+	fmt.Println(len(mas))
+	fmt.Println(mas)
 }
