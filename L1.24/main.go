@@ -16,6 +16,26 @@
 
 package main
 
-func main() {
+import (
+	"fmt"
+	"math"
+)
 
+type Point struct {
+	x float64
+	y float64
+}
+
+func (p *Point) Distance(p2 *Point) float64 {
+	return math.Pow((math.Pow((p2.x-p.x), 2) + math.Pow((p2.y-p.y), 2)), 1/2.0)
+}
+
+func NewPoint(x, y float64) *Point {
+	return &Point{x, y}
+}
+
+func main() {
+	a := NewPoint(0, 0)
+	b := NewPoint(-1, 1)
+	fmt.Printf("%.5f", b.Distance(a))
 }
