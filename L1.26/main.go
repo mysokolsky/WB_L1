@@ -18,23 +18,44 @@ package main
 import "strings"
 import "fmt"
 
-func main() {
-	str := "строка без povtareniy"
+func IsUniqueSymbols(str string) bool {
+	// сначала делаем копию строки только прописных символов, а после конвертируем строку в слайс рун
 	editLowerStr := []rune(strings.ToLower(str))
-	// editStr := []rune(str) // создаём копию строки str типа []rune
 
+	// создаём мапу для хранения уникальных ключей-символов.
+	// Значения нам не нужны, поэтому их делаем пустыми типа struct{}. По сути это тип set
 	m := make(map[rune]struct{}, len(editLowerStr))
 
+	// делаем обход слайса
 	for _, value := range editLowerStr {
+
+		// проверяем существование такого символа в виде ключа в мапе
 		_, ok := m[value]
+
+		// при встрече символа, который уже есть в мапе, выходим
 		if ok {
-			println("false")
-			fmt.Printf("дубликат: '%v'\n", string(value))
-			return
-		} else {
-			m[value] = struct{}{}
+			return false
 		}
+		m[value] = struct{}{} // заносим неповторяющиеся символы ключами в мапу
 	}
-	println("true")
-	println("дублирующих символов нет")
+	return true
+}
+
+func main() {
+
+	strs := []string{
+		"abcd",
+		"abCdefAaf",
+		"aabcd",
+		"строка без_povtareniy",
+		"строка С_пОвТАРениямИ", // без конвертации в прописные буквы эта строка будет с уникальными символами
+		"",
+		" 	",  // вот тут символ пробела и потом таб и можно было бы конечно оптимизировать, но по условию задачи это не нужно
+		" \r", // и тут тоже
+	}
+
+	// обход тестовых строк
+	for _, val := range strs {
+		fmt.Printf("%s : %v\n", val, IsUniqueSymbols(val))
+	}
 }
