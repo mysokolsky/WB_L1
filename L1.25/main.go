@@ -27,37 +27,37 @@ import (
 var wg sync.WaitGroup
 
 // горутина
-func timerExit(name string, ch5 chan int) {
+func timerExit(name string, ch chan int) {
 	defer wg.Done()
 
 	fmt.Printf("Горутина (%s) завершится через 4 секунды\n", name)
 	defer fmt.Printf("Горутина (%s) завершила работу\n", name)
 
 	for {
-		value, ok := <-ch5 // читаем данные из канала
-		if !ok {           // условие завершения горутины
-			fmt.Println("Горутина №5: выход по окончанию таймера")
+		value, ok := <-ch // читаем данные из канала
+		if !ok {          // условие завершения горутины
+			fmt.Println("Горутина: выход по окончанию таймера")
 			return
 		}
-		fmt.Println("g5:", value)
+		fmt.Println("g:", value)
 	}
 
 }
 
 // вызов горутины
 func timerExitRun() {
-	ch5 := make(chan int)
+	ch := make(chan int)
 	timer := time.After(4 * time.Second)
 	wg.Add(1)
-	go timerExit("time.After", ch5) // запуск горутины
-loop2:
+	go timerExit("time.After", ch) // запуск горутины
+loop:
 	for i := 0; ; i++ {
 		select {
 		case <-timer: // при закрытии канала таймера
-			close(ch5) // закрываем канал данных
-			break loop2
+			close(ch) // закрываем канал данных
+			break loop
 		default:
-			ch5 <- i*i - i // наполнение канала данными
+			ch <- i*i - i // наполнение канала данными
 			time.Sleep(400 * time.Millisecond)
 		}
 	}
@@ -65,7 +65,7 @@ loop2:
 
 func main() {
 
-	timerExitRun() // 5 - time.After
+	timerExitRun() // time.After
 
 	wg.Wait()
 }
