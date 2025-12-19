@@ -38,7 +38,7 @@ type BigFloatPairSimpleArithmetics interface {
 	Add() *big.Float
 	Sub() *big.Float
 	Mul() *big.Float
-	// Div(num1, num2 interface{}) *big.Float
+	Div() *big.Float
 }
 
 // type Adapter struct {
@@ -55,6 +55,14 @@ func (b *BigFloatPair) Add() {
 
 func (b *BigFloatPair) Sub() {
 	b.result = Sub(b.num1, b.num2)
+}
+
+func (b *BigFloatPair) Mul() {
+	b.result = Mul(b.num1, b.num2)
+}
+
+func (b *BigFloatPair) Div() {
+	b.result = Div(b.num1, b.num2)
 }
 
 func Add(num1, num2 *big.Float) *big.Float {
@@ -74,8 +82,8 @@ func Mul(num1, num2 *big.Float) *big.Float {
 
 func Div(num1, num2 *big.Float) *big.Float {
 
-	return new(big.Float).
-	//Div(num1, num2)
+	return new(big.Float).Quo(num1, num2)
+
 }
 
 func NumToString(num interface{}) string {
@@ -103,7 +111,7 @@ func main() {
 
 	b := NewBigFloatPair(n1, n2)
 
-	b.Add()
+	b.Div()
 
 	fmt.Println(b.result)
 

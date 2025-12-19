@@ -26,16 +26,20 @@ type Point struct {
 	y float64
 }
 
-func (p *Point) Distance(p2 *Point) float64 {
-	return math.Pow((math.Pow((p2.x-p.x), 2) + math.Pow((p2.y-p.y), 2)), 1/2.0)
+// поскольку изменений координат не предусмотрено, мы можем делать метод без указателя
+func (p Point) Distance(other Point) float64 {
+	dx := other.x - p.x
+	dy := other.y - p.y
+	return math.Sqrt(dx*dx + dy*dy)
 }
 
-func NewPoint(x, y float64) *Point {
-	return &Point{x, y}
+// в задании не указано, что конструктор должен возвращать указатель
+func NewPoint(x, y float64) Point {
+	return Point{x, y}
 }
 
 func main() {
-	a := NewPoint(0, 0)
+	a := NewPoint(0, 0) // а можно даже без конструктора a := Point{0, 0}
 	b := NewPoint(-1, 1)
-	fmt.Printf("%.5f", b.Distance(a))
+	fmt.Printf("%.6f", b.Distance(a)) // печать с 6ю знаками после запятой согласно спецификатору
 }
