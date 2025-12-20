@@ -105,13 +105,20 @@ func NumToBigFloat(num interface{}) *big.Float {
 	return b
 }
 
+func ProcessArithmetics(p BigFloatPairSimpleArithmetics) {
+	p.Add()
+	p.Div()
+	p.Mul()
+	p.Sub()
+}
+
 func main() {
 	var n1 float64 = 3
 	var n2 int = -1
 
 	b := NewBigFloatPair(n1, n2)
 
-	b.Div()
+	ProcessArithmetics(b)
 
 	fmt.Println(b.result)
 
