@@ -17,73 +17,21 @@ import (
 	"math/big"
 )
 
-type BigFloatPair struct {
-	num1 *big.Float
-	num2 *big.Float
-
-	result *big.Float
+type BigFloat struct {
+	value *big.Float
 }
 
-func NewBigFloatPair(n1, n2 interface{}) *BigFloatPair {
-
-	num1 := NumToBigFloat(n1)
-	num2 := NumToBigFloat(n2)
-
-	b := BigFloatPair{num1, num2, nil}
-
-	return &b
+func (b *BigFloat) Add(num *big.Float) *big.Float {
+	return new(big.Float).Add(b.value, num)
 }
-
-type BigFloatPairSimpleArithmetics interface {
-	Add() *big.Float
-	Sub() *big.Float
-	Mul() *big.Float
-	Div() *big.Float
+func (b *BigFloat) Sub(num *big.Float) *big.Float {
+	return new(big.Float).Sub(b.value, num)
 }
-
-// type Adapter struct {
-// 	b *BigFloatPair
-// }
-
-// func (a *Adapter) Add() {
-
-// }
-
-func (b *BigFloatPair) Add() {
-	b.result = Add(b.num1, b.num2)
+func (b *BigFloat) Mul(num *big.Float) *big.Float {
+	return new(big.Float).Mul(b.value, num)
 }
-
-func (b *BigFloatPair) Sub() {
-	b.result = Sub(b.num1, b.num2)
-}
-
-func (b *BigFloatPair) Mul() {
-	b.result = Mul(b.num1, b.num2)
-}
-
-func (b *BigFloatPair) Div() {
-	b.result = Div(b.num1, b.num2)
-}
-
-func Add(num1, num2 *big.Float) *big.Float {
-
-	return new(big.Float).Add(num1, num2)
-}
-
-func Sub(num1, num2 *big.Float) *big.Float {
-
-	return new(big.Float).Sub(num1, num2)
-}
-
-func Mul(num1, num2 *big.Float) *big.Float {
-
-	return new(big.Float).Mul(num1, num2)
-}
-
-func Div(num1, num2 *big.Float) *big.Float {
-
-	return new(big.Float).Quo(num1, num2)
-
+func (b *BigFloat) Div(num *big.Float) *big.Float {
+	return new(big.Float).Quo(b.value, num)
 }
 
 func NumToString(num interface{}) string {
@@ -105,21 +53,15 @@ func NumToBigFloat(num interface{}) *big.Float {
 	return b
 }
 
-func ProcessArithmetics(p BigFloatPairSimpleArithmetics) {
-	p.Add()
-	p.Div()
-	p.Mul()
-	p.Sub()
-}
-
 func main() {
 	var n1 float64 = 3
 	var n2 int = -1
 
-	b := NewBigFloatPair(n1, n2)
+	num1 := NumToBigFloat(n1)
+	num2 := NumToBigFloat(n2)
 
-	ProcessArithmetics(b)
+	result :=
 
-	fmt.Println(b.result)
+		fmt.Println(b.result)
 
 }
